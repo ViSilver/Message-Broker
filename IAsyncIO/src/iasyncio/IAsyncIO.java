@@ -3,8 +3,8 @@ package iasyncio;
 
 public interface IAsyncIO {
     
-    public String asyncRead(String location);
+    public String read(String location);
     
-    public void asyncWrite(String location, String data);
+    public void write(String location, String data);
 }
 

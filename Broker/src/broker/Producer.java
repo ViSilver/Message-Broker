@@ -27,7 +27,7 @@ public class Producer implements Runnable{
                 
         try {
             while(true) {
-                message = netRead.asyncRead("localhost");
+                message = netRead.read("localhost");
                 queue.put(message);
                 // send confirmation message
                 System.out.println("Inserting the message into the queue: " + message);

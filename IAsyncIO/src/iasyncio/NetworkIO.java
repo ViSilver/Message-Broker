@@ -22,7 +22,7 @@ public class NetworkIO implements IAsyncIO {
     }
 
     @Override
-    public String asyncRead(String location) {
+    public String read(String location) {
         String strNet = "";
         
         try {
@@ -49,7 +49,7 @@ public class NetworkIO implements IAsyncIO {
     }
 
     @Override
-    public void asyncWrite(String location, String data) {
+    public void write(String location, String data) {
         
         final String data1 = "(" + location + ")" + data;
         

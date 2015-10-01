@@ -12,8 +12,9 @@ import java.util.logging.Logger;
 
 public class App1 {
     
-    private static BlockingQueue queue1 = new LinkedBlockingQueue();
-    private static BlockingQueue queue2 = new LinkedBlockingQueue();
+    private static BlockingQueue queMessage = new LinkedBlockingQueue();
+    private static BlockingQueue queFile = new LinkedBlockingQueue();
+    private static int messCounter = 0;
 //    private static ExecutorService execNet = Executors.newCachedThreadPool();
 //    private static ExecutorService execFile = Executors.newCachedThreadPool();
 
@@ -30,12 +31,12 @@ public class App1 {
                 
                 try {
                     while(true) {
-                        message = netRead.asyncRead("localhost");
+                        message = netRead.read("localhost");
                         //send confirmation back
                         int index = message.indexOf(")");
                         int length = message.length();
                         message = message.substring(index + 1, length);
-                        queue1.put(message);
+                        queMessage.put(message);
                     }
                 } catch (InterruptedException ex) {
                     Logger.getLogger(App1.class.getName()).log(Level.SEVERE, null, ex);
@@ -53,10 +54,16 @@ public class App1 {
                 IAsyncIO netWrite = new NetworkIO(3000);
                 
                 // take the message from the queue
-                String message = "Hello from sender.";
+                String message = "";
                 
-                System.out.println("Sending message");
-                netWrite.asyncWrite("App2", message);
+                try {
+                    message = (String) queFile.take();
+                    System.out.println("Sending message");
+                    netWrite.write("App2", message);
+//                    Thread.sleep(3000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(App1.class.getName()).log(Level.SEVERE, null, ex);
+                }               
 //                        int index = message.indexOf(")");
 //                        int length = message.length();
 //                        message = message.substring(index + 1, length);
@@ -70,14 +77,40 @@ public class App1 {
             public void run() {
                 IAsyncIO fileRead = new FileIO();
                 
+                String data = fileRead.read("src/sender/input.xml");
+                
+                try {
+                    queFile.put(data);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(App1.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
-            
         });
         
-        listener.start();
-        sender.start();    
-        // sending and receiving messages must be asynchronously performed
+        Thread writer = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                
+                IAsyncIO fileWrite = new FileIO(); 
+                while(true){
+                    try {
+                        String data = (String) queMessage.take();
+                        messCounter++;
+                        String location = "src/sender/mess" + messCounter + ".xml";
+                        fileWrite.write(location, data);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(App1.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        });
         
+        reader.start();
+        listener.start();
+        sender.start(); 
+        writer.start();
+        // sending and receiving messages must be asynchronously performed
+       
     }
-    
 }

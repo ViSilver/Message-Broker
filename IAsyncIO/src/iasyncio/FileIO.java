@@ -1,9 +1,11 @@
 package iasyncio;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Scanner;
 //import java.util.concurrent.Callable;
 //import java.util.concurrent.ExecutorService;
@@ -18,7 +20,7 @@ public class FileIO implements IAsyncIO {
     }
     
     @Override
-    public String asyncRead(String location){
+    public String read(String location){
                 
         String strFile = "";
         try{
@@ -31,15 +33,18 @@ public class FileIO implements IAsyncIO {
     }
 
     @Override
-    public void asyncWrite(String location, String data) {
+    public void write(String location, String data) {
         
         try {
-            PrintWriter out = new PrintWriter(location);
-            out.print(data);
-            out.close();
-        } catch (FileNotFoundException ex) {
+            byte[] fileArray = data.getBytes();
+            Path newFilePath = Paths.get(location);
+            Path parentDir = newFilePath.getParent();
+            if(!Files.exists(parentDir)){
+                Files.createDirectories(parentDir);
+            }
+            Files.write(newFilePath, fileArray, StandardOpenOption.CREATE);
+        } catch (IOException ex) {
             Logger.getLogger(FileIO.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
     }
 }

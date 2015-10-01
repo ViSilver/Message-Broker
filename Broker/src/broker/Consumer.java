@@ -10,11 +10,11 @@ import java.util.logging.Logger;
 
 public class Consumer implements Runnable{
     
-    private BlockingQueue queue;
+    private BlockingQueue queMessage;
 //    private ExecutorService executor = Executors.newCachedThreadPool();
     
     Consumer(BlockingQueue q) {
-        queue = q;
+        queMessage = q;
     }
 
     @Override
@@ -24,7 +24,7 @@ public class Consumer implements Runnable{
         while(true){
             try {
 //          Thread.sleep(10000);
-                message = (String) queue.take();
+                message = (String) queMessage.take();
                 System.out.println("Resending");
             } catch (InterruptedException ex) {
                 Logger.getLogger(Broker.class.getName()).log(Level.SEVERE, null, ex);
@@ -60,7 +60,7 @@ public class Consumer implements Runnable{
                     break;
             }
                 
-            netWrite.asyncWrite(receiver, message);
+            netWrite.write(receiver, message);
         }
     }
 }

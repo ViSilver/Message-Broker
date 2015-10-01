@@ -22,7 +22,7 @@ public class Broker {
         resender1.start();
 //        resender2.start();
         
-        listener.join();
+//        listener.join();
         
     }
     
