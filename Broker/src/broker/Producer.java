@@ -4,15 +4,15 @@ import iasyncio.FileIO;
 import iasyncio.NetworkIO;
 import iasyncio.IAsyncIO;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+//import java.util.concurrent.ExecutorService;
+//import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Producer implements Runnable{
     
     private BlockingQueue queue;
-    private ExecutorService executor = Executors.newCachedThreadPool();
+//    private ExecutorService executor = Executors.newCachedThreadPool();
     
     Producer(BlockingQueue q){
         queue = q;
@@ -21,8 +21,8 @@ public class Producer implements Runnable{
     @Override
     public void run() {
         // listen to the messages
-        IAsyncIO netRead = new NetworkIO(3000, executor);
-        IAsyncIO fileRead = new FileIO(executor);
+        IAsyncIO netRead = new NetworkIO(3000);
+        IAsyncIO fileRead = new FileIO();
         String message = "";
                 
         try {

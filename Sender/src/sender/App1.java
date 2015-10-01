@@ -4,8 +4,8 @@ import iasyncio.FileIO;
 import iasyncio.NetworkIO;
 import iasyncio.IAsyncIO;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+//import java.util.concurrent.ExecutorService;
+//import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,8 +14,8 @@ public class App1 {
     
     private static BlockingQueue queue1 = new LinkedBlockingQueue();
     private static BlockingQueue queue2 = new LinkedBlockingQueue();
-    private static ExecutorService execNet = Executors.newCachedThreadPool();
-    private static ExecutorService execFile = Executors.newCachedThreadPool();
+//    private static ExecutorService execNet = Executors.newCachedThreadPool();
+//    private static ExecutorService execFile = Executors.newCachedThreadPool();
 
     public static void main(String[] args) throws InterruptedException{
         //listens to the port 3001
@@ -25,7 +25,7 @@ public class App1 {
             @Override
             public void run() {
                 // listen to the messages
-                IAsyncIO netRead = new NetworkIO(3001, execNet);
+                IAsyncIO netRead = new NetworkIO(3001);
                 String message = "";
                 
                 try {
@@ -50,7 +50,7 @@ public class App1 {
             @Override
             public void run() {
                 // listen to the messages
-                IAsyncIO netWrite = new NetworkIO(3000, execNet);
+                IAsyncIO netWrite = new NetworkIO(3000);
                 
                 // take the message from the queue
                 String message = "Hello from sender.";
@@ -68,7 +68,7 @@ public class App1 {
 
             @Override
             public void run() {
-                IAsyncIO fileRead = new FileIO(execFile);
+                IAsyncIO fileRead = new FileIO();
                 
             }
             

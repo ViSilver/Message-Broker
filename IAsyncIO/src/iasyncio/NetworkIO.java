@@ -4,21 +4,21 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
+//import java.util.concurrent.Callable;
+//import java.util.concurrent.ExecutorService;
+//import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class NetworkIO implements IAsyncIO {
     
     private DatagramSocket datagramSocket;
-    private ExecutorService executor;
+//    private ExecutorService executor;
     private final int port;
     
-    public NetworkIO(int port, ExecutorService executor){
+    public NetworkIO(int port){
         this.port = port;
-        this.executor = executor;
+//        this.executor = executor;
     }
 
     @Override
@@ -67,9 +67,7 @@ public class NetworkIO implements IAsyncIO {
             
                 } catch (IOException ex) {
                     Logger.getLogger(NetworkIO.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                
-                
+                }   
     }
     
 }

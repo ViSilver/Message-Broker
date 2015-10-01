@@ -3,8 +3,8 @@ package receiver;
 import iasyncio.NetworkIO;
 import iasyncio.IAsyncIO;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+//import java.util.concurrent.ExecutorService;
+//import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,13 +13,13 @@ public class App2 {
 
     private static BlockingQueue queue1 = new LinkedBlockingQueue();
     private static BlockingQueue queue2 = new LinkedBlockingQueue();
-    private static ExecutorService execNet = Executors.newCachedThreadPool();
-    private static ExecutorService execFile = Executors.newCachedThreadPool();
+//    private static ExecutorService execNet = Executors.newCachedThreadPool();
+//    private static ExecutorService execFile = Executors.newCachedThreadPool();
             
     public static void main(String[] args){
         
         IAsyncIO netWrite;
-        netWrite = new NetworkIO(3000, execNet);
+        netWrite = new NetworkIO(3000);
         
         Thread listener;
         listener = new Thread(new Runnable() {
@@ -27,7 +27,7 @@ public class App2 {
             @Override
             public void run() {
                 // listen to the messages
-                IAsyncIO netRead = new NetworkIO(3002, execNet);
+                IAsyncIO netRead = new NetworkIO(3002);
                 String message = "";
                 
                 try {

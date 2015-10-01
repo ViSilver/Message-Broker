@@ -3,15 +3,15 @@ package broker;
 import iasyncio.NetworkIO;
 import iasyncio.IAsyncIO;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+//import java.util.concurrent.ExecutorService;
+//import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Consumer implements Runnable{
     
     private BlockingQueue queue;
-    private ExecutorService executor = Executors.newCachedThreadPool();
+//    private ExecutorService executor = Executors.newCachedThreadPool();
     
     Consumer(BlockingQueue q) {
         queue = q;
@@ -40,23 +40,23 @@ public class Consumer implements Runnable{
                 
             switch(receiver) {
                 case "App1":
-                    netWrite = new NetworkIO(3001, executor);
+                    netWrite = new NetworkIO(3001);
                     break;
                         
                 case "App2":
-                    netWrite = new NetworkIO(3002, executor);
+                    netWrite = new NetworkIO(3002);
                     break;
                         
                 case "App3":
-                    netWrite = new NetworkIO(3003, executor);
+                    netWrite = new NetworkIO(3003);
                     break;
                         
                 case "App4":
-                    netWrite = new NetworkIO(3004, executor);
+                    netWrite = new NetworkIO(3004);
                     break;
                         
                 default:
-                    netWrite = new NetworkIO(3001, executor);
+                    netWrite = new NetworkIO(3001);
                     break;
             }
                 
