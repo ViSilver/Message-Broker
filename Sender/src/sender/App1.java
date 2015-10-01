@@ -1,8 +1,8 @@
 package sender;
 
-import asyncio.AsyncFile;
-import asyncio.AsyncNetwork;
-import asyncio.IAsyncIO;
+import iasyncio.FileIO;
+import iasyncio.NetworkIO;
+import iasyncio.IAsyncIO;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,7 +25,7 @@ public class App1 {
             @Override
             public void run() {
                 // listen to the messages
-                IAsyncIO netRead = new AsyncNetwork(3001, execNet);
+                IAsyncIO netRead = new NetworkIO(3001, execNet);
                 String message = "";
                 
                 try {
@@ -50,7 +50,7 @@ public class App1 {
             @Override
             public void run() {
                 // listen to the messages
-                IAsyncIO netWrite = new AsyncNetwork(3000, execNet);
+                IAsyncIO netWrite = new NetworkIO(3000, execNet);
                 
                 // take the message from the queue
                 String message = "Hello from sender.";
@@ -68,7 +68,7 @@ public class App1 {
 
             @Override
             public void run() {
-                IAsyncIO fileRead = new AsyncFile(execFile);
+                IAsyncIO fileRead = new FileIO(execFile);
                 
             }
             

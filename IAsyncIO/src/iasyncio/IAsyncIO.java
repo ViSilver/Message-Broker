@@ -1,4 +1,4 @@
-package asyncio;
+package iasyncio;
 
 
 public interface IAsyncIO {
@@ -7,3 +7,4 @@ public interface IAsyncIO {
     
     public void asyncWrite(String location, String data);
 }
+

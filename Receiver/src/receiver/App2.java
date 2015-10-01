@@ -1,7 +1,7 @@
 package receiver;
 
-import asyncio.AsyncNetwork;
-import asyncio.IAsyncIO;
+import iasyncio.NetworkIO;
+import iasyncio.IAsyncIO;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,7 +19,7 @@ public class App2 {
     public static void main(String[] args){
         
         IAsyncIO netWrite;
-        netWrite = new AsyncNetwork(3000, execNet);
+        netWrite = new NetworkIO(3000, execNet);
         
         Thread listener;
         listener = new Thread(new Runnable() {
@@ -27,7 +27,7 @@ public class App2 {
             @Override
             public void run() {
                 // listen to the messages
-                IAsyncIO netRead = new AsyncNetwork(3002, execNet);
+                IAsyncIO netRead = new NetworkIO(3002, execNet);
                 String message = "";
                 
                 try {

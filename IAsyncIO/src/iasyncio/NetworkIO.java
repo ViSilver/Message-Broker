@@ -1,4 +1,4 @@
-package asyncio;
+package iasyncio;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -10,13 +10,13 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class AsyncNetwork implements IAsyncIO {
+public class NetworkIO implements IAsyncIO {
     
     private DatagramSocket datagramSocket;
     private ExecutorService executor;
     private final int port;
     
-    public AsyncNetwork(int port, ExecutorService executor){
+    public NetworkIO(int port, ExecutorService executor){
         this.port = port;
         this.executor = executor;
     }
@@ -42,7 +42,7 @@ public class AsyncNetwork implements IAsyncIO {
             }
             
         } catch (IOException ex) {
-            Logger.getLogger(AsyncNetwork.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NetworkIO.class.getName()).log(Level.SEVERE, null, ex);
         }      
         
         return strNet;
@@ -66,7 +66,7 @@ public class AsyncNetwork implements IAsyncIO {
                     datagramSocket.send(packet);
             
                 } catch (IOException ex) {
-                    Logger.getLogger(AsyncNetwork.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(NetworkIO.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 
                 

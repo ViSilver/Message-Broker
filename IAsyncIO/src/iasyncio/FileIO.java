@@ -1,4 +1,4 @@
-package asyncio;
+package iasyncio;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,11 +12,11 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class AsyncFile implements IAsyncIO {
+public class FileIO implements IAsyncIO {
     
     private ExecutorService executor = Executors.newCachedThreadPool();
     
-    public AsyncFile(ExecutorService executor) {
+    public FileIO(ExecutorService executor) {
         this.executor = executor;
     }
     
@@ -47,7 +47,7 @@ public class AsyncFile implements IAsyncIO {
             out.print(data);
             out.close();
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(AsyncFile.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FileIO.class.getName()).log(Level.SEVERE, null, ex);
         }
         
     }

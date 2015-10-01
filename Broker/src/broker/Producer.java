@@ -1,8 +1,8 @@
 package broker;
 
-import asyncio.AsyncFile;
-import asyncio.AsyncNetwork;
-import asyncio.IAsyncIO;
+import iasyncio.FileIO;
+import iasyncio.NetworkIO;
+import iasyncio.IAsyncIO;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -21,8 +21,8 @@ public class Producer implements Runnable{
     @Override
     public void run() {
         // listen to the messages
-        IAsyncIO netRead = new AsyncNetwork(3000, executor);
-        IAsyncIO fileRead = new AsyncFile(executor);
+        IAsyncIO netRead = new NetworkIO(3000, executor);
+        IAsyncIO fileRead = new FileIO(executor);
         String message = "";
                 
         try {

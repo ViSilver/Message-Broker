@@ -1,7 +1,7 @@
 package broker;
 
-import asyncio.AsyncNetwork;
-import asyncio.IAsyncIO;
+import iasyncio.NetworkIO;
+import iasyncio.IAsyncIO;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -40,23 +40,23 @@ public class Consumer implements Runnable{
                 
             switch(receiver) {
                 case "App1":
-                    netWrite = new AsyncNetwork(3001, executor);
+                    netWrite = new NetworkIO(3001, executor);
                     break;
                         
                 case "App2":
-                    netWrite = new AsyncNetwork(3002, executor);
+                    netWrite = new NetworkIO(3002, executor);
                     break;
                         
                 case "App3":
-                    netWrite = new AsyncNetwork(3003, executor);
+                    netWrite = new NetworkIO(3003, executor);
                     break;
                         
                 case "App4":
-                    netWrite = new AsyncNetwork(3004, executor);
+                    netWrite = new NetworkIO(3004, executor);
                     break;
                         
                 default:
-                    netWrite = new AsyncNetwork(3001, executor);
+                    netWrite = new NetworkIO(3001, executor);
                     break;
             }
                 
