@@ -4,8 +4,8 @@ import iasyncio.FileIO;
 import iasyncio.NetworkIO;
 import iasyncio.IAsyncIO;
 import java.util.concurrent.BlockingQueue;
-//import java.util.concurrent.ExecutorService;
-//import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,7 +15,7 @@ public class App2 {
     private static BlockingQueue queMessage = new LinkedBlockingQueue();
     private static BlockingQueue queFile = new LinkedBlockingQueue();
     private static int messCounter = 0;
-//    private static ExecutorService execNet = Executors.newCachedThreadPool();
+    private static ExecutorService executor = Executors.newFixedThreadPool(4);
 //    private static ExecutorService execFile = Executors.newCachedThreadPool();
             
     public static void main(String[] args){
@@ -23,8 +23,8 @@ public class App2 {
         IAsyncIO netWrite;
         netWrite = new NetworkIO(3000);
         
-        Thread listener;
-        listener = new Thread(new Runnable() {
+        Runnable listener;
+        listener = new Runnable() {
             
             @Override
             public void run() {
@@ -47,11 +47,11 @@ public class App2 {
                     }
                 }
             }
-        });
+        };
         
 //        String str = net.asyncRead("localhost");
         
-        Thread sender = new Thread(new Runnable() {
+        Runnable sender = new Runnable() {
             
             @Override
             public void run() {
@@ -61,22 +61,26 @@ public class App2 {
                 // take the message from the queue
                 String message = "";
                 
-                try {
-                    message = (String) queFile.take();
-                    System.out.println("Sending message");
-                    netWrite.write("App2", message);
+                message = "(subscribe)(app:2)(port:3002)";
+                
+                while(true) {
+                    try {
+                        message = (String) queFile.take();
+                        System.out.println("Sending message");
+                        netWrite.write("App2", message);
 //                    Thread.sleep(3000);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(App2.class.getName()).log(Level.SEVERE, null, ex);
-                }               
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(App2.class.getName()).log(Level.SEVERE, null, ex);
+                    }   
+                }
 //                        int index = message.indexOf(")");
 //                        int length = message.length();
 //                        message = message.substring(index + 1, length);
 //                        queue.put(message);
             }
-        });
+        };
         
-        Thread reader = new Thread(new Runnable(){
+        Runnable reader = new Runnable(){
 
             @Override
             public void run() {
@@ -90,9 +94,9 @@ public class App2 {
                     Logger.getLogger(App2.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-        });
+        };
         
-        Thread writer = new Thread(new Runnable() {
+        Runnable writer = new Runnable() {
 
             @Override
             public void run() {
@@ -110,13 +114,11 @@ public class App2 {
                     }
                 }
             }
-        });
+        };
         
-        listener.start();
-        writer.start();
-        
-        
-        
+        executor.submit(listener);
+        executor.submit(writer);   
+                
 //        String str;
 //        try {
 //            str = (String) queMessage.take();
