@@ -55,6 +55,8 @@ public class Consumer implements Runnable{
         Subscriber rcvr;
         rcvr = new Subscriber(id, port, ip);
         // store it into the list of receivers
+        
+        subscribers.add(rcvr);
     }
     
     
@@ -74,7 +76,7 @@ public class Consumer implements Runnable{
     
 
     private BlockingQueue queMessage;
-    private ArrayList subscribers = new ArrayList();
+    private ArrayList<Subscriber> subscribers = new ArrayList<Subscriber>();
 //    private ExecutorService executor = Executors.newCachedThreadPool();
     
     Consumer(BlockingQueue q) {
