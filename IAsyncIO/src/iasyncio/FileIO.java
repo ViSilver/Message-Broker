@@ -13,6 +13,7 @@ import java.util.Scanner;
 //import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import utils.Message;
 
 public class FileIO implements IAsyncIO {
     
@@ -20,7 +21,7 @@ public class FileIO implements IAsyncIO {
     }
     
     @Override
-    public String read(String location){
+    public Message read(String location){
                 
         String strFile = "";
         try{
@@ -28,15 +29,20 @@ public class FileIO implements IAsyncIO {
         } catch (IOException ex) {
             System.out.println(ex);
         }
-        return strFile;
+        
+        Message m = new Message();
+        m.setType("message");
+        m.setBody(strFile);
+        
+        return m;
         
     }
 
     @Override
-    public void write(String location, String data) {
+    public void write(String location, Message mess) {
         
         try {
-            byte[] fileArray = data.getBytes();
+            byte[] fileArray = mess.getBody().getBytes();
             Path newFilePath = Paths.get(location);
             Path parentDir = newFilePath.getParent();
             if(!Files.exists(parentDir)){

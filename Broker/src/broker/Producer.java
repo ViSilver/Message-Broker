@@ -8,10 +8,11 @@ import java.util.concurrent.BlockingQueue;
 //import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import utils.Message;
 
 public class Producer implements Runnable{
     
-    private BlockingQueue queue;
+    private BlockingQueue<Message> queue;
 //    private ExecutorService executor = Executors.newCachedThreadPool();
     
     Producer(BlockingQueue q){
@@ -23,14 +24,15 @@ public class Producer implements Runnable{
         // listen to the messages
         IAsyncIO netRead = new NetworkIO(3000);
         IAsyncIO fileRead = new FileIO();
-        String message = "";
+        
+        Message m;
                 
         try {
             while(true) {
-                message = netRead.read("localhost");
-                queue.put(message);
+                m = netRead.read("localhost");
+                queue.put(m);
                 // send confirmation message
-                System.out.println("Inserting the message into the queue: " + message);
+                System.out.println("Inserting the message into the queue: " + m);
             }
         } catch (InterruptedException ex) {
             Logger.getLogger(Broker.class.getName()).log(Level.SEVERE, null, ex);

@@ -3,6 +3,8 @@ package receiver;
 import iasyncio.FileIO;
 import iasyncio.NetworkIO;
 import iasyncio.IAsyncIO;
+import utils.Message;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -12,8 +14,8 @@ import java.util.logging.Logger;
 
 public class App2 {
 
-    private static BlockingQueue queMessage = new LinkedBlockingQueue();
-    private static BlockingQueue queFile = new LinkedBlockingQueue();
+    private static BlockingQueue<Message> queMessage = new LinkedBlockingQueue();
+    private static BlockingQueue<Message> queFile = new LinkedBlockingQueue();
     private static int messCounter = 0;
     private static ExecutorService executor = Executors.newFixedThreadPool(4);
 //    private static ExecutorService execFile = Executors.newCachedThreadPool();
@@ -30,15 +32,16 @@ public class App2 {
             public void run() {
                 // listen to the messages
                 IAsyncIO netRead = new NetworkIO(3002);
-                String message = "";
+                Message message = new Message();
+                String subdata;
            
                 while (true) {
                     try {
-                        message = "";
                         message = netRead.read("localhost");
-                        int index = message.indexOf(")");
-                        int length = message.length();
-                        message = message.substring(index + 1, length);
+                        int index = message.getBody().indexOf(")");
+                        int length = message.getBody().length();
+                        subdata = message.getBody().substring(index + 1, length);
+                        message.setBody(subdata);
                         queMessage.put(message);
                         System.out.println("Received message");
 //                        break;
@@ -59,13 +62,14 @@ public class App2 {
                 IAsyncIO netWrite = new NetworkIO(3000);
                 
                 // take the message from the queue
-                String message = "";
+                Message message = new Message();
                 
-                message = "(subscribe)(app:2)(port:3002)";
+                message.setType("message");
+                message.setBody("(subscribe)(app:2)(port:3002)");
                 
                 while(true) {
                     try {
-                        message = (String) queFile.take();
+                        message = queFile.take();
                         System.out.println("Sending message");
                         netWrite.write("App2", message);
 //                    Thread.sleep(3000);
@@ -86,10 +90,10 @@ public class App2 {
             public void run() {
                 IAsyncIO fileRead = new FileIO();
                 
-                String data = fileRead.read("src/sender/input.xml");
+                Message message = fileRead.read("src/sender/input.xml");
                 
                 try {
-                    queFile.put(data);
+                    queFile.put(message);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(App2.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -104,11 +108,11 @@ public class App2 {
                 IAsyncIO fileWrite = new FileIO(); 
                 while(true){
                     try {
-                        String data = (String) queMessage.take();
+                        Message message = queMessage.take();
                         messCounter++;
                         String location = "src/receiver/mess" + messCounter + ".xml";
-                        fileWrite.write(location, data);
-                        System.out.println("Receiver received and wrote to file:\n" + data);
+                        fileWrite.write(location, message);
+                        System.out.println("Receiver received and wrote to file:\n" + message);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(App2.class.getName()).log(Level.SEVERE, null, ex);
                     }

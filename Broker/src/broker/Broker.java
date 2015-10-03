@@ -4,10 +4,11 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import utils.Message;
 
 public class Broker {
     
-    static BlockingQueue queue = new LinkedBlockingQueue();
+    static BlockingQueue<Message> queue = new LinkedBlockingQueue();
     private static ExecutorService executor = Executors.newCachedThreadPool();
 
     public static void main(String[] args) throws InterruptedException {

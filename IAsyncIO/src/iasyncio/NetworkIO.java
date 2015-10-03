@@ -9,6 +9,7 @@ import java.net.InetAddress;
 //import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import utils.Message;
 
 public class NetworkIO implements IAsyncIO {
     
@@ -22,7 +23,8 @@ public class NetworkIO implements IAsyncIO {
     }
 
     @Override
-    public String read(String location) {
+    public Message read(String location) {
+        Message message = new Message();
         String strNet = "";
         
         try {
@@ -38,18 +40,21 @@ public class NetworkIO implements IAsyncIO {
                 
                 datagramSocket.close();
                 
-                return strNet;
+                // parse the input string
+                // set the corresponding type and body/params
+                
+                return message;
             }
             
         } catch (IOException ex) {
             Logger.getLogger(NetworkIO.class.getName()).log(Level.SEVERE, null, ex);
         }      
         
-        return strNet;
+        return message;
     }
 
     @Override
-    public void write(String location, String data) {
+    public void write(String location, utils.Message data) {
         
         final String data1 = "(" + location + ")" + data;
         

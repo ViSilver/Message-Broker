@@ -1,10 +1,12 @@
 package iasyncio;
 
+import utils.Message;
+
 
 public interface IAsyncIO {
     
-    public String read(String location);
+    public Message read(String location);
     
-    public void write(String location, String data);
+    public void write(String location, Message data);
 }
 

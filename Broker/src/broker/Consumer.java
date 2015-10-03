@@ -2,6 +2,8 @@ package broker;
 
 import iasyncio.NetworkIO;
 import iasyncio.IAsyncIO;
+import utils.Message;
+
 import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 //import java.util.concurrent.ExecutorService;
@@ -61,12 +63,15 @@ public class Consumer implements Runnable{
     
     
     void sendMessage(String data){
+        // it receives a string of the form:
+        // "(from:id1)(to:id1,id2)message"
         
     }
     
     
     void pingResponse(String data){
-        
+        // it receives a string of the form
+        // "(from:id,port2)"
     }
     
     
@@ -75,7 +80,7 @@ public class Consumer implements Runnable{
     }
     
 
-    private BlockingQueue queMessage;
+    private BlockingQueue<Message> queMessage;
     private ArrayList<Subscriber> subscribers = new ArrayList<Subscriber>();
 //    private ExecutorService executor = Executors.newCachedThreadPool();
     
@@ -86,21 +91,22 @@ public class Consumer implements Runnable{
     
     @Override
     public void run() {
-        String message = "";
+        Message message = new Message();
         String[] params;
            
         while(true){
             try {
 //          Thread.sleep(10000);
-                message = (String) queMessage.take();
+                message = queMessage.take();
                 System.out.println("Resending");
+                // all the switch must be inside try
             } catch (InterruptedException ex) {
                 Logger.getLogger(Broker.class.getName()).log(Level.SEVERE, null, ex);
             }
             
             //implement some logic for processing the resending
             
-            params = getParam(message);
+            params = message.getParams();
             switch(params[0]){
                 case "subscribe":
                     // broker receives a subsribe message 
@@ -130,7 +136,7 @@ public class Consumer implements Runnable{
                     
                 case "received":
                     // received a delivery confirmation
-                    // about a sent message
+                    // from app about a sent message
                     changeMessDelivStatus(params[1]);
                     break;
                     
