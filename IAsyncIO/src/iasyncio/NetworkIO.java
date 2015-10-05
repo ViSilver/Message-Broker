@@ -1,6 +1,8 @@
 package iasyncio;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -15,13 +17,17 @@ public class NetworkIO implements IAsyncIO {
     
     private DatagramSocket datagramSocket;
 //    private ExecutorService executor;
-    private final int port;
-    
-    public NetworkIO(int port){
+    private int port;
+
+    public void setPort(int port) {
         this.port = port;
-//        this.executor = executor;
     }
 
+    public int getPort() {
+        return port;
+    }
+    
+    
     @Override
     public Message read(String location) {
         Message message = new Message();
@@ -54,25 +60,24 @@ public class NetworkIO implements IAsyncIO {
     }
 
     @Override
-    public void write(String location, utils.Message data) {
-        
-        final String data1 = "(" + location + ")" + data;
-        
-        
-                try {
-                    datagramSocket = new DatagramSocket();
-                    
-                    byte[] buffer = data1.getBytes();
-                    System.out.println("Buffer length: " + buffer.length);
-                    InetAddress host = InetAddress.getByName("localhost");
+    public void write(String location, Message mess) {
+       
+        try {
+            datagramSocket = new DatagramSocket();
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            ObjectOutputStream objOutStream = new ObjectOutputStream(outStream);
+            objOutStream.writeObject(mess);
+            byte[] buffer = outStream.toByteArray();
             
-                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length, host, port);
+            InetAddress host = InetAddress.getByName("localhost");
             
-                    datagramSocket.send(packet);
-            
-                } catch (IOException ex) {
-                    Logger.getLogger(NetworkIO.class.getName()).log(Level.SEVERE, null, ex);
-                }   
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, host, port);
+
+            datagramSocket.send(packet);
+
+        } catch (IOException ex) {
+            Logger.getLogger(NetworkIO.class.getName()).log(Level.SEVERE, null, ex);
+        }  
     }
     
 }

@@ -11,7 +11,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Consumer implements Runnable{
+public class Consumer implements Runnable {
     
     private class Subscriber {
         public String name;
@@ -62,10 +62,34 @@ public class Consumer implements Runnable{
     }
     
     
-    void sendMessage(String data){
+    void sendMessage(String data, NetworkIO netWriter){
         // it receives a string of the form:
         // "(from:id1)(to:id1,id2)message"
+        Message mess = new Message();
         
+        String tmp[] = getParam(data);
+        String from = tmp[0].split(":")[1];
+        
+        tmp = getParam(tmp[1]);
+        String to = tmp[0].split(":")[1];
+        
+        mess.setBody(tmp[1]);
+        mess.setType("mess");
+        
+        String[] params = new String[2];
+        params[0] = from;
+        params[1] = to;
+        
+        mess.setParams(params);
+        
+        // create a netWrite obj according to "to" param
+        
+        for(Subscriber subscriber : this.subscribers){
+            if(subscriber.name == to){
+                netWriter.setPort(subscriber.port);
+                netWriter.write(to, mess);
+            }
+        }
     }
     
     
@@ -93,6 +117,7 @@ public class Consumer implements Runnable{
     public void run() {
         Message message = new Message();
         String[] params;
+        NetworkIO netWriter = new NetworkIO();
            
         while(true){
             try {
@@ -115,7 +140,7 @@ public class Consumer implements Runnable{
                     break;
                     
                 case "mess":
-                    sendMessage(params[1]);
+                    sendMessage(params[1], netWriter);
                     break;
                     
                 case "ping":
@@ -149,30 +174,30 @@ public class Consumer implements Runnable{
                 
             IAsyncIO netWrite;
                 
-            switch(receiver) {
-                case "App1":
-                    netWrite = new NetworkIO(3001);
-                    break;
-                        
-                case "App2":
-                    netWrite = new NetworkIO(3002);
-                    break;
-                        
-                case "App3":
-                    netWrite = new NetworkIO(3003);
-                    break;
-                        
-                case "App4":
-                    netWrite = new NetworkIO(3004);
-                    break;
-                        
-                default:
-                    netWrite = new NetworkIO(3001);
-                    break;
-            }
+//            switch(receiver) {
+//                case "App1":
+//                    netWrite = new NetworkIO(3001);
+//                    break;
+//                        
+//                case "App2":
+//                    netWrite = new NetworkIO(3002);
+//                    break;
+//                        
+//                case "App3":
+//                    netWrite = new NetworkIO(3003);
+//                    break;
+//                        
+//                case "App4":
+//                    netWrite = new NetworkIO(3004);
+//                    break;
+//                        
+//                default:
+//                    netWrite = new NetworkIO(3001);
+//                    break;
+//            }
             
             // create a thread for each resending
-            netWrite.write(receiver, message);
+//            netWrite.write(receiver, message);
         }
     }
 }

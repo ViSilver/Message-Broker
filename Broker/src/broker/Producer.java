@@ -22,7 +22,8 @@ public class Producer implements Runnable{
     @Override
     public void run() {
         // listen to the messages
-        IAsyncIO netRead = new NetworkIO(3000);
+        NetworkIO netRead = new NetworkIO();
+        netRead.setPort(3000);
         IAsyncIO fileRead = new FileIO();
         
         Message m;

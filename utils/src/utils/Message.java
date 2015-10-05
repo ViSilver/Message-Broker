@@ -1,6 +1,8 @@
 package utils;
 
-public class Message {
+import java.io.Serializable;
+
+public class Message implements Serializable {
     
     private String type;
     private String body;
@@ -36,6 +38,7 @@ public class Message {
         return params;
     }
     
+    @Override
     public String toString(){
         return this.body;
     }
