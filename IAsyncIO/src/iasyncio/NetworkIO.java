@@ -1,7 +1,9 @@
 package iasyncio;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -31,7 +33,6 @@ public class NetworkIO implements IAsyncIO {
     @Override
     public Message read(String location) {
         Message message = new Message();
-        String strNet = "";
         
         try {
             this.datagramSocket = new DatagramSocket(port);
@@ -40,7 +41,15 @@ public class NetworkIO implements IAsyncIO {
             while (true)  {
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 datagramSocket.receive(packet);
-                strNet = new String(buffer);
+                byte[] data = packet.getData();
+                ByteArrayInputStream in = new ByteArrayInputStream(data);
+                ObjectInputStream is = new ObjectInputStream(in);
+                
+                try{
+                    message = (Message) is.readObject();
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(NetworkIO.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 
                 // save the data from the request app (request.getAddress(), request.getPort())
                 
