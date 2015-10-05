@@ -28,7 +28,8 @@ public class App1 {
             @Override
             public void run() {
                 // listen to the messages
-                IAsyncIO netRead = new NetworkIO(3001);
+                NetworkIO netRead = new NetworkIO();
+                netRead.setPort(3001);
                 Message message = new Message();
                 String mess = "";
                 
@@ -55,7 +56,8 @@ public class App1 {
             @Override
             public void run() {
                 // listen to the messages
-                IAsyncIO netWrite = new NetworkIO(3000);
+                NetworkIO netWrite = new NetworkIO();
+                netWrite.setPort(3000);
                 
                 // take the message from the queue
                 Message message = new Message();

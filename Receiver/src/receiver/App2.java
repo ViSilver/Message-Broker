@@ -22,8 +22,8 @@ public class App2 {
             
     public static void main(String[] args){
         
-        IAsyncIO netWrite;
-        netWrite = new NetworkIO(3000);
+        NetworkIO netWrite = new NetworkIO();
+        netWrite.setPort(3000);
         
         Runnable listener;
         listener = new Runnable() {
@@ -31,7 +31,9 @@ public class App2 {
             @Override
             public void run() {
                 // listen to the messages
-                IAsyncIO netRead = new NetworkIO(3002);
+                NetworkIO netRead = new NetworkIO();
+                netRead.setPort(3002);
+                
                 Message message = new Message();
                 String subdata;
            
@@ -59,7 +61,8 @@ public class App2 {
             @Override
             public void run() {
                 // listen to the messages
-                IAsyncIO netWrite = new NetworkIO(3000);
+                NetworkIO netWrite = new NetworkIO();
+                netWrite.setPort(3000);
                 
                 // take the message from the queue
                 Message message = new Message();
