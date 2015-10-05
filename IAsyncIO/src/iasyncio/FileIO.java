@@ -31,7 +31,7 @@ public class FileIO implements IAsyncIO {
         }
         
         Message m = new Message();
-        m.setType("message");
+        m.setType("mess");
         m.setBody(strFile);
         
         return m;

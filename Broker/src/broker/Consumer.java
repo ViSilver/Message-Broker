@@ -26,70 +26,49 @@ public class Consumer implements Runnable {
     }
     
     
-    String[] getParam(String s) {
-        
-        String[] params = new String[2];
-        
-        int index = s.indexOf(")");
-        int length = s.length();
-        String param = s.substring(1, index);
-        String rest = s.substring(index + 1, length);
-        params[0] = param;
-        params[1] = rest;
-                
-        return params;
-    }
+//    String[] getParam(String s) {
+//        
+//        String[] params = new String[2];
+//        
+//        int index = s.indexOf(")");
+//        int length = s.length();
+//        String param = s.substring(1, index);
+//        String rest = s.substring(index + 1, length);
+//        params[0] = param;
+//        params[1] = rest;
+//                
+//        return params;
+//    }
     
     
-    void subscribeApp(String data){
-        // it receives a string of the form:
-        // "(app:id1)(port:3002)(ip:127.0.0.1)"
+    void subscribeApp(String[] params){
         
-        String[] tmp = getParam(data); 
-        String id = tmp[0].split(":")[1];
+        String appName = params[0];
+        String ip = params[1];
+        int port = Integer.parseInt(params[2]);
         
-        tmp = getParam(tmp[1]);
-        int port = Integer.parseInt(tmp[0].split(":")[1]);
-        
-        tmp = getParam(tmp[1]);
-        String ip = tmp[0].split(":")[1];
-        
-        Subscriber rcvr;
-        rcvr = new Subscriber(id, port, ip);
+        Subscriber rcvr = new Subscriber(appName, port, ip);
         // store it into the list of receivers
         
         subscribers.add(rcvr);
+        
+        System.out.println("Subscribed app: " + rcvr.name);
     }
     
     
-    void sendMessage(String data, NetworkIO netWriter){
-        // it receives a string of the form:
-        // "(from:id1)(to:id1,id2)message"
-        Message mess = new Message();
-        
-        String tmp[] = getParam(data);
-        String from = tmp[0].split(":")[1];
-        
-        tmp = getParam(tmp[1]);
-        String to = tmp[0].split(":")[1];
-        
-        mess.setBody(tmp[1]);
-        mess.setType("mess");
-        
-        String[] params = new String[2];
-        params[0] = from;
-        params[1] = to;
-        
-        mess.setParams(params);
-        
+    void sendMessage(Message mess, NetworkIO netWriter){
         // create a netWrite obj according to "to" param
+        String to = mess.getParams()[1];
         
         for(Subscriber subscriber : this.subscribers){
             if(subscriber.name == to){
                 netWriter.setPort(subscriber.port);
                 netWriter.write(to, mess);
+                System.out.println("Resending the message to" + to);
             }
         }
+        
+        System.out.println("The receiver wasn't found.");
     }
     
     
@@ -123,7 +102,7 @@ public class Consumer implements Runnable {
             try {
 //          Thread.sleep(10000);
                 message = queMessage.take();
-                System.out.println("Resending");
+                System.out.println("Retrieving from message queue");
                 // all the switch must be inside try
             } catch (InterruptedException ex) {
                 Logger.getLogger(Broker.class.getName()).log(Level.SEVERE, null, ex);
@@ -132,15 +111,17 @@ public class Consumer implements Runnable {
             //implement some logic for processing the resending
             
             params = message.getParams();
-            switch(params[0]){
+            switch(message.getType()){
                 case "subscribe":
                     // broker receives a subsribe message 
                     // from an app
-                    subscribeApp(params[1]);
+                    System.out.println("Received a subscription from: " + message.getParams()[0]);
+                    subscribeApp(params);
                     break;
                     
                 case "mess":
-                    sendMessage(params[1], netWriter);
+                    System.out.println("Received a message: " + message.getParams()[1]);
+                    sendMessage(message, netWriter);
                     break;
                     
                 case "ping":
@@ -172,7 +153,7 @@ public class Consumer implements Runnable {
             String receiver = params[1];
        
                 
-            IAsyncIO netWrite;
+//            IAsyncIO netWrite;
                 
 //            switch(receiver) {
 //                case "App1":

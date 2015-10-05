@@ -25,8 +25,7 @@ public class App2 {
         NetworkIO netWrite = new NetworkIO();
         netWrite.setPort(3000);
         
-        Runnable listener;
-        listener = new Runnable() {
+        Runnable listener = new Runnable() {
             
             @Override
             public void run() {
@@ -40,10 +39,10 @@ public class App2 {
                 while (true) {
                     try {
                         message = netRead.read("localhost");
-                        int index = message.getBody().indexOf(")");
-                        int length = message.getBody().length();
-                        subdata = message.getBody().substring(index + 1, length);
-                        message.setBody(subdata);
+//                        int index = message.getBody().indexOf(")");
+//                        int length = message.getBody().length();
+//                        subdata = message.getBody().substring(index + 1, length);
+//                        message.setBody(subdata);
                         queMessage.put(message);
                         System.out.println("Received message");
 //                        break;
@@ -66,13 +65,29 @@ public class App2 {
                 
                 // take the message from the queue
                 Message message = new Message();
+                String[] params = new String[3];
                 
-                message.setType("message");
-                message.setBody("(subscribe)(app:2)(port:3002)");
+                message.setType("subscribe");
+                params[0] = "App2";
+                params[1] = "localhost";
+                params[2] = "3002";
+                message.setParams(params);
+                
+                netWrite.write("Broker", message);
+                
+                System.out.println("Sending subscription");
                 
                 while(true) {
                     try {
                         message = queFile.take();
+//                
+                        params = new String[3];
+                        params[0] = "App2";     // From
+                        params[1] = "App1";     // To
+                        params[2] = "0";        // ID of message
+                
+                        message.setParams(params);
+                        
                         System.out.println("Sending message");
                         netWrite.write("App2", message);
 //                    Thread.sleep(3000);
@@ -93,12 +108,21 @@ public class App2 {
             public void run() {
                 IAsyncIO fileRead = new FileIO();
                 
-                Message message = fileRead.read("src/sender/input.xml");
+                Message message = fileRead.read("src/receiver/input.xml");
+//                message.setType("mess");
+//                
+//                String[] params = new String[3];
+//                params[0] = "App2";     // From
+//                params[1] = "App1";     // To
+//                params[2] = "0";        // ID of message
+//                
+//                message.setParams(params);
+                
                 
                 try {
                     queFile.put(message);
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(App2.class.getName()).log(Level.SEVERE, null, ex);
+                    ex.printStackTrace();
                 }
             }
         };
@@ -124,7 +148,8 @@ public class App2 {
         };
         
         executor.submit(listener);
-        executor.submit(writer);   
+        executor.submit(writer); 
+        executor.submit(sender);
                 
 //        String str;
 //        try {

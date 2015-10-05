@@ -61,17 +61,30 @@ public class App1 {
                 
                 // take the message from the queue
                 Message message = new Message();
-                String[] params = new String[2];
+                String[] params = new String[3];
                 
                 message.setType("subscribe");
-                params[0] = "app:1";
-                params[1] = "port:3001"; 
+                params[0] = "App1";
+                params[1] = "localhost";
+                params[1] = "3001"; 
                 message.setParams(params);
                 // try to send the subscription message 
+                
+                netWrite.write("Broker", message);
+                
+                System.out.println("Sending subscription");
                 
                 while(true){
                     try {
                         message = queFile.take();
+//                
+                        params = new String[3];
+                        params[0] = "App1";     // From
+                        params[1] = "App2";     // To
+                        params[2] = "0";        // ID of message
+                
+                        message.setParams(params);
+                        
                         System.out.println("Sending message");
                         netWrite.write("App2", message);
 //                    Thread.sleep(3000);
