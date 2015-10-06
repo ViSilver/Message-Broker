@@ -24,7 +24,6 @@ public class Consumer implements Runnable {
         }
     }
     
-    
 //    String[] getParam(String s) {
 //        
 //        String[] params = new String[2];
@@ -38,7 +37,6 @@ public class Consumer implements Runnable {
 //                
 //        return params;
 //    }
-    
     
     synchronized void subscribeApp(String[] params){
         
@@ -108,7 +106,6 @@ public class Consumer implements Runnable {
 //          Thread.sleep(10000);
                 message = queMessage.take();
 //                System.out.println("Retrieving from message queue");
-                // all the switch must be inside try
             } catch (InterruptedException ex) {
                 Logger.getLogger(Broker.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -118,17 +115,11 @@ public class Consumer implements Runnable {
             params = message.getParams();
             switch(message.getType()){
                 case "subscribe":
-                    // broker receives a subsribe message 
-                    // from an app
-                    
-                    
-                        
                     subscribeApp(params);
-                    
                     break;
                     
                 case "mess":
-                    System.out.println("Received a message: " + message.getParams()[1]);
+                    System.out.println("Received a message: " + params[1]);
                     sendMessage(message, netWriter);
                     break;
                     
@@ -148,17 +139,17 @@ public class Consumer implements Runnable {
                     }
                     break;
                     
-                case "received":
+                case "conf_deliv":
                     // received a delivery confirmation
                     // from app about a sent message
+                    Message confirmation = new Message();
+                    confirmation.setType("conf_deliv");
                     changeMessDelivStatus(params[1]);
                     break;
                     
                 default:
                     break;
             }
-            
-            String receiver = params[1];
        
                 
 //            IAsyncIO netWrite;

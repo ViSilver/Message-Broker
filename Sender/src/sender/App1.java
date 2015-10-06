@@ -74,11 +74,11 @@ public class App1 {
                 
                 System.out.println("Sending subscription");
                 
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(App1.class.getName()).log(Level.SEVERE, null, ex);
-                }
+//                try {
+//                    Thread.sleep(2000);
+//                } catch (InterruptedException ex) {
+//                    Logger.getLogger(App1.class.getName()).log(Level.SEVERE, null, ex);
+//                }
                 
                 while(true){
                     try {

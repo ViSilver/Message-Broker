@@ -26,15 +26,14 @@ public class Producer implements Runnable{
         netRead.setPort(3000);
         IAsyncIO fileRead = new FileIO();
         
-        Message m;
+        Message mess;
                 
         try {
             while(true) {
-                m = netRead.read("localhost");
-//                System.out.println("Inserting the message into the queue: " + m);
+                mess = netRead.read("localhost");
+                System.out.println("Inserting the message into the queue: " + mess);
                 // here is the deadlock
-                queue.put(m);
-                // send confirmation message !!!!!!!!!!!!!!!!
+                queue.put(mess);
             }
         } catch (InterruptedException ex) {
             Logger.getLogger(Broker.class.getName()).log(Level.SEVERE, null, ex);
