@@ -1,11 +1,10 @@
 package broker;
 
 import iasyncio.NetworkIO;
-import iasyncio.IAsyncIO;
 import utils.Message;
 
-import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 //import java.util.concurrent.ExecutorService;
 //import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -41,7 +40,7 @@ public class Consumer implements Runnable {
 //    }
     
     
-    void subscribeApp(String[] params){
+    synchronized void subscribeApp(String[] params){
         
         String appName = params[0];
         String ip = params[1];
@@ -49,8 +48,12 @@ public class Consumer implements Runnable {
         
         Subscriber rcvr = new Subscriber(appName, port, ip);
         // store it into the list of receivers
-        
-        subscribers.add(rcvr);
+        try {
+            System.out.println("Received a subscription from: " + appName);
+            subscribers.put(rcvr);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         System.out.println("Subscribed app: " + rcvr.name);
     }
@@ -61,10 +64,12 @@ public class Consumer implements Runnable {
         String to = mess.getParams()[1];
         
         for(Subscriber subscriber : this.subscribers){
-            if(subscriber.name == to){
+            System.out.println(subscriber.name);
+            if(to.equals(subscriber.name)){
                 netWriter.setPort(subscriber.port);
                 netWriter.write(to, mess);
                 System.out.println("Resending the message to" + to);
+                return;
             }
         }
         
@@ -84,8 +89,8 @@ public class Consumer implements Runnable {
     
 
     private BlockingQueue<Message> queMessage;
-    private ArrayList<Subscriber> subscribers = new ArrayList<Subscriber>();
-//    private ExecutorService executor = Executors.newCachedThreadPool();
+    private BlockingQueue<Subscriber> subscribers = new LinkedBlockingQueue<Subscriber>();
+    private static final Object mutex = new Object();
     
     Consumer(BlockingQueue q) {
         queMessage = q;
@@ -102,7 +107,7 @@ public class Consumer implements Runnable {
             try {
 //          Thread.sleep(10000);
                 message = queMessage.take();
-                System.out.println("Retrieving from message queue");
+//                System.out.println("Retrieving from message queue");
                 // all the switch must be inside try
             } catch (InterruptedException ex) {
                 Logger.getLogger(Broker.class.getName()).log(Level.SEVERE, null, ex);
@@ -115,8 +120,11 @@ public class Consumer implements Runnable {
                 case "subscribe":
                     // broker receives a subsribe message 
                     // from an app
-                    System.out.println("Received a subscription from: " + message.getParams()[0]);
+                    
+                    
+                        
                     subscribeApp(params);
+                    
                     break;
                     
                 case "mess":

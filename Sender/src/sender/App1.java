@@ -66,13 +66,19 @@ public class App1 {
                 message.setType("subscribe");
                 params[0] = "App1";
                 params[1] = "localhost";
-                params[1] = "3001"; 
+                params[2] = "3001"; 
                 message.setParams(params);
                 // try to send the subscription message 
                 
                 netWrite.write("Broker", message);
                 
                 System.out.println("Sending subscription");
+                
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(App1.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 
                 while(true){
                     try {
