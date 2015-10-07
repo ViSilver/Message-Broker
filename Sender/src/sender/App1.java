@@ -18,7 +18,6 @@ public class App1 {
     private static BlockingQueue<Message> queFile = new LinkedBlockingQueue();
     private static int messCounter = 0;
     private static ExecutorService executor = Executors.newFixedThreadPool(4);
-//    private static ExecutorService execFile = Executors.newCachedThreadPool();
 
     public static void main(String[] args) throws InterruptedException{
         //listens to the port 3001
@@ -31,16 +30,11 @@ public class App1 {
                 NetworkIO netRead = new NetworkIO();
                 netRead.setPort(3001);
                 Message message = new Message();
-                String mess = "";
                 
                 try {
                     while(true) {
                         message = netRead.read("localhost");
                         //send confirmation back
-                        int index = mess.indexOf(")");
-                        int length = mess.length();
-                        mess = mess.substring(index + 1, length);
-                        message.setBody(mess);
                         queMessage.put(message);
                     }
                 } catch (InterruptedException ex) {
@@ -93,15 +87,10 @@ public class App1 {
                         
                         System.out.println("Sending message");
                         netWrite.write("App2", message);
-//                    Thread.sleep(3000);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(App1.class.getName()).log(Level.SEVERE, null, ex);
                     }    
                 }
-//                        int index = message.indexOf(")");
-//                        int length = message.length();
-//                        message = message.substring(index + 1, length);
-//                        queue.put(message);
             }
         };
         
@@ -130,9 +119,13 @@ public class App1 {
                 while(true){
                     try {
                         Message mess = queMessage.take();
-                        messCounter++;
-                        String location = "src/sender/mess" + messCounter + ".xml";
-                        fileWrite.write(location, mess);
+                        if(!mess.getType().equals("deliv_conf")){
+                            messCounter++;
+                            String location = "src/sender/mess" + messCounter + ".xml";
+                            fileWrite.write(location, mess);
+                        } else {
+                            System.out.println("Message " + mess.getParams()[0] + " was confirmed");
+                        }
                     } catch (InterruptedException ex) {
                         Logger.getLogger(App1.class.getName()).log(Level.SEVERE, null, ex);
                     }

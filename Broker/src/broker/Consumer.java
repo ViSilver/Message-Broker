@@ -1,6 +1,8 @@
 package broker;
 
+import utils.Subscriber;
 import iasyncio.NetworkIO;
+import java.util.Iterator;
 import utils.Message;
 
 import java.util.concurrent.BlockingQueue;
@@ -12,17 +14,6 @@ import java.util.logging.Logger;
 
 public class Consumer implements Runnable {
     
-    private class Subscriber {
-        public String name;
-        public int port;
-        public String IP;
-        
-        Subscriber(String name, int port, String ip){
-            this.name = name;
-            this.port = port;
-            this.IP = ip;
-        }
-    }
     
 //    String[] getParam(String s) {
 //        
@@ -38,7 +29,7 @@ public class Consumer implements Runnable {
 //        return params;
 //    }
     
-    synchronized void subscribeApp(String[] params){
+    void subscribeApp(String[] params){
         
         String appName = params[0];
         String ip = params[1];
@@ -48,29 +39,41 @@ public class Consumer implements Runnable {
         // store it into the list of receivers
         try {
             System.out.println("Received a subscription from: " + appName);
-            subscribers.put(rcvr);
+            this.subscribers.put(rcvr);
+            System.out.println("Subscribed app: " + rcvr.name);
+            
+            Iterator<Subscriber> it = this.subscribers.iterator();
+            while(it.hasNext()){
+                System.out.println(it.next().name);
+            }
+            
         } catch (InterruptedException ex) {
             Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        System.out.println("Subscribed app: " + rcvr.name);
     }
     
     
-    void sendMessage(Message mess, NetworkIO netWriter){
+    synchronized void sendMessage(Message mess, NetworkIO netWriter){
         // create a netWrite obj according to "to" param
         String to = mess.getParams()[1];
+        Iterator<Subscriber> it = this.subscribers.iterator();
         
-        for(Subscriber subscriber : this.subscribers){
-            System.out.println(subscriber.name);
-            if(to.equals(subscriber.name)){
-                netWriter.setPort(subscriber.port);
+        if(this.subscribers.isEmpty()){
+            System.out.println("The subs q is empty");
+        }
+        
+        while(it.hasNext()){
+            Subscriber sub = it.next();
+            System.out.println(sub.name);
+            if(to.equals(sub.name)){
+                netWriter.setPort(sub.port);
                 netWriter.write(to, mess);
-                System.out.println("Resending the message to" + to);
+                System.out.println("Resending the message to " + to);
                 return;
             }
         }
         
+        // save the message into a file
         System.out.println("The receiver wasn't found.");
     }
     
@@ -90,8 +93,9 @@ public class Consumer implements Runnable {
     private BlockingQueue<Subscriber> subscribers = new LinkedBlockingQueue<Subscriber>();
     private static final Object mutex = new Object();
     
-    Consumer(BlockingQueue q) {
+    Consumer(BlockingQueue q, BlockingQueue subs) {
         queMessage = q;
+        subscribers = subs;
     }
     
     
@@ -121,6 +125,24 @@ public class Consumer implements Runnable {
                 case "mess":
                     System.out.println("Received a message: " + params[1]);
                     sendMessage(message, netWriter);
+                    
+                    Message confirmation = new Message();
+                    confirmation.setType("deliv_conf");
+                    String[] confParams = new String[2];
+                    confParams[0] = params[2]; // mess id
+                    confParams[1] = params[0]; // sender id (sending back to it)
+                    confirmation.setParams(confParams);
+                    System.out.println("here");
+                    
+                    {
+                        try {
+                            queMessage.put(confirmation);
+                            
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    
                     break;
                     
                 case "ping":
@@ -139,45 +161,17 @@ public class Consumer implements Runnable {
                     }
                     break;
                     
-                case "conf_deliv":
+                case "deliv_conf":
                     // received a delivery confirmation
                     // from app about a sent message
-                    Message confirmation = new Message();
-                    confirmation.setType("conf_deliv");
+                    System.out.println("Deliver confirmation for: " + message.getParams()[1]);
+                    sendMessage(message, netWriter);
                     changeMessDelivStatus(params[1]);
                     break;
                     
                 default:
                     break;
             }
-       
-                
-//            IAsyncIO netWrite;
-                
-//            switch(receiver) {
-//                case "App1":
-//                    netWrite = new NetworkIO(3001);
-//                    break;
-//                        
-//                case "App2":
-//                    netWrite = new NetworkIO(3002);
-//                    break;
-//                        
-//                case "App3":
-//                    netWrite = new NetworkIO(3003);
-//                    break;
-//                        
-//                case "App4":
-//                    netWrite = new NetworkIO(3004);
-//                    break;
-//                        
-//                default:
-//                    netWrite = new NetworkIO(3001);
-//                    break;
-//            }
-            
-            // create a thread for each resending
-//            netWrite.write(receiver, message);
         }
     }
 }

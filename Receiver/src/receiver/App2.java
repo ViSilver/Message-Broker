@@ -18,7 +18,6 @@ public class App2 {
     private static BlockingQueue<Message> queFile = new LinkedBlockingQueue();
     private static int messCounter = 0;
     private static ExecutorService executor = Executors.newFixedThreadPool(4);
-//    private static ExecutorService execFile = Executors.newCachedThreadPool();
             
     public static void main(String[] args){
         
@@ -39,10 +38,6 @@ public class App2 {
                 while (true) {
                     try {
                         message = netRead.read("localhost");
-//                        int index = message.getBody().indexOf(")");
-//                        int length = message.getBody().length();
-//                        subdata = message.getBody().substring(index + 1, length);
-//                        message.setBody(subdata);
                         queMessage.put(message);
                         System.out.println("Received message");
 //                        break;
@@ -52,8 +47,6 @@ public class App2 {
                 }
             }
         };
-        
-//        String str = net.asyncRead("localhost");
         
         Runnable sender = new Runnable() {
             
@@ -95,10 +88,6 @@ public class App2 {
                         Logger.getLogger(App2.class.getName()).log(Level.SEVERE, null, ex);
                     }   
                 }
-//                        int index = message.indexOf(")");
-//                        int length = message.length();
-//                        message = message.substring(index + 1, length);
-//                        queue.put(message);
             }
         };
         
@@ -109,15 +98,6 @@ public class App2 {
                 IAsyncIO fileRead = new FileIO();
                 
                 Message message = fileRead.read("src/receiver/input.xml");
-//                message.setType("mess");
-//                
-//                String[] params = new String[3];
-//                params[0] = "App2";     // From
-//                params[1] = "App1";     // To
-//                params[2] = "0";        // ID of message
-//                
-//                message.setParams(params);
-                
                 
                 try {
                     queFile.put(message);
@@ -149,17 +129,6 @@ public class App2 {
         
         executor.submit(listener);
         executor.submit(writer); 
-        executor.submit(sender);
-                
-//        String str;
-//        try {
-//            str = (String) queMessage.take();
-//            System.out.println("Receiver received: " + str);
-//        } catch (InterruptedException ex) {
-//            Logger.getLogger(App2.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-        
-        // sending and receiving messages must be asynchronously
-        
+        executor.submit(sender);  
     }
 }
