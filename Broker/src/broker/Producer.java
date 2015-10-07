@@ -34,7 +34,7 @@ public class Producer implements Runnable{
         try {
             while(true) {
                 mess = netRead.read("localhost");
-                System.out.println("Inserting the message into the queue: " + mess);
+//                System.out.println("Inserting the message into the queue: " + mess);
                 // here is the deadlock
                 queue.put(mess);
             }

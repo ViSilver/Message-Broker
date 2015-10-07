@@ -33,13 +33,24 @@ public class App2 {
                 netRead.setPort(3002);
                 
                 Message message = new Message();
-                String subdata;
+                Message confirmation = new Message();
            
                 while (true) {
                     try {
                         message = netRead.read("localhost");
                         queMessage.put(message);
                         System.out.println("Received message");
+                        
+                        String[] params = message.getParams();
+                        
+                        confirmation.setType("deliv_conf");
+                        String[] confParams = new String[2];
+                        confParams[0] = params[2]; // mess id
+                        confParams[1] = "Broker"; // sender id (sending back to it)
+                        confirmation.setParams(confParams);
+                        
+                        netWrite.write("Broker", confirmation);
+                        
 //                        break;
                     } catch (InterruptedException ex) {
                         Logger.getLogger(App2.class.getName()).log(Level.SEVERE, null, ex);

@@ -38,15 +38,9 @@ public class Consumer implements Runnable {
         Subscriber rcvr = new Subscriber(appName, port, ip);
         // store it into the list of receivers
         try {
-            System.out.println("Received a subscription from: " + appName);
+//            System.out.println("Received a subscription from: " + appName);
             this.subscribers.put(rcvr);
-            System.out.println("Subscribed app: " + rcvr.name);
-            
-            Iterator<Subscriber> it = this.subscribers.iterator();
-            while(it.hasNext()){
-                System.out.println(it.next().name);
-            }
-            
+//            System.out.println("Subscribed app: " + rcvr.name);
         } catch (InterruptedException ex) {
             Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -164,8 +158,12 @@ public class Consumer implements Runnable {
                 case "deliv_conf":
                     // received a delivery confirmation
                     // from app about a sent message
-                    System.out.println("Deliver confirmation for: " + message.getParams()[1]);
-                    sendMessage(message, netWriter);
+                    if(!message.getParams()[1].equals("Broker")){
+                        System.out.println("Deliver confirmation for: " + message.getParams()[0]);
+                        sendMessage(message, netWriter);
+                    } else {
+                        System.out.println("The message " + message.getParams()[0] + " was delivered");
+                    }
                     changeMessDelivStatus(params[1]);
                     break;
                     
