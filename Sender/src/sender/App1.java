@@ -21,6 +21,8 @@ public class App1 {
 
     public static void main(String[] args) throws InterruptedException{
         //listens to the port 3001 
+        NetworkIO netWrite = new NetworkIO();
+        netWrite.setPort(3000);
         
         Runnable listener = new Runnable() {
             
@@ -30,20 +32,29 @@ public class App1 {
                 NetworkIO netRead = new NetworkIO();
                 netRead.setPort(3001);
                 Message message = new Message();
+                Message confirmation = new Message();
                 
                 try {
                     while(true) {
                         message = netRead.read("localhost");
                         //send confirmation back
                         queMessage.put(message);
+                        
+                        String[] params = message.getParams();
+                        
+                        confirmation.setType("deliv_conf");
+                        String[] confParams = new String[2];
+                        confParams[0] = params[2]; // mess id
+                        confParams[1] = "Broker"; // sender id (sending back to it)
+                        confirmation.setParams(confParams);
+                        
+                        netWrite.write("Broker", confirmation);
                     }
                 } catch (InterruptedException ex) {
                     Logger.getLogger(App1.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         };
-        
-        // implement a thread which will send several messages to other aplications
         
         Runnable sender = new Runnable() {
             
@@ -68,16 +79,10 @@ public class App1 {
                 
                 System.out.println("Sending subscription");
                 
-//                try {
-//                    Thread.sleep(2000);
-//                } catch (InterruptedException ex) {
-//                    Logger.getLogger(App1.class.getName()).log(Level.SEVERE, null, ex);
-//                }
-                
                 while(true){
                     try {
                         message = queFile.take();
-//                
+                        
                         params = new String[3];
                         params[0] = "App1";     // From
                         params[1] = "App2";     // To
@@ -137,7 +142,5 @@ public class App1 {
         executor.submit(listener);
         executor.submit(sender);
         executor.submit(writer);
-        // sending and receiving messages must be asynchronously performed
-       
     }
 }

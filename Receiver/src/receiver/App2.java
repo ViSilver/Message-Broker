@@ -108,13 +108,13 @@ public class App2 {
             public void run() {
                 IAsyncIO fileRead = new FileIO();
                 
-                Message message = fileRead.read("src/receiver/input.xml");
-                
-                try {
-                    queFile.put(message);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
-                }
+//                Message message = fileRead.read("src/receiver/input.xml");
+//                
+//                try {
+//                    queFile.put(message);
+//                } catch (InterruptedException ex) {
+//                    ex.printStackTrace();
+//                }
             }
         };
         
@@ -126,11 +126,14 @@ public class App2 {
                 IAsyncIO fileWrite = new FileIO(); 
                 while(true){
                     try {
-                        Message message = queMessage.take();
-                        messCounter++;
-                        String location = "src/receiver/mess" + messCounter + ".xml";
-                        fileWrite.write(location, message);
-                        System.out.println("Receiver received and wrote to file:\n" + message);
+                        Message mess = queMessage.take();
+                        if(!mess.getType().equals("deliv_conf")){
+                            messCounter++;
+                            String location = "src/sender/mess" + messCounter + ".xml";
+                            fileWrite.write(location, mess);
+                        } else {
+                            System.out.println("Message " + mess.getParams()[0] + " was confirmed");
+                        }
                     } catch (InterruptedException ex) {
                         Logger.getLogger(App2.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -140,6 +143,7 @@ public class App2 {
         
         executor.submit(listener);
         executor.submit(writer); 
-        executor.submit(sender);  
+        executor.submit(sender);
+        executor.submit(reader);
     }
 }
