@@ -1,6 +1,8 @@
 package broker;
 
 import utils.Subscriber;
+import utils.MessageFile;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,13 +15,14 @@ public class Broker {
     
     static BlockingQueue<Message> queue = new LinkedBlockingQueue();
     static BlockingQueue<Subscriber> subscribers = new LinkedBlockingQueue();
+    static BlockingQueue<MessageFile> messFiles = new LinkedBlockingQueue();
     private static ExecutorService executor = Executors.newCachedThreadPool();
 
     public static void main(String[] args) throws InterruptedException {
         
         Runnable listener = new Producer(queue);
-        Runnable resender1 = new Consumer(queue, subscribers);
-        Runnable resender2 = new Consumer(queue, subscribers);
+        Runnable resender1 = new Consumer(queue, subscribers, messFiles);
+        Runnable resender2 = new Consumer(queue, subscribers, messFiles);
         
         executor.submit(listener);
         executor.submit(resender1);

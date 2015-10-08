@@ -2,15 +2,15 @@ package broker;
 
 import utils.Subscriber;
 import iasyncio.NetworkIO;
-import java.util.Iterator;
 import utils.Message;
+import utils.MessageFile;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-//import java.util.concurrent.ExecutorService;
-//import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Iterator;
 
 public class Consumer implements Runnable {
     
@@ -84,12 +84,15 @@ public class Consumer implements Runnable {
     
 
     private BlockingQueue<Message> queMessage;
-    private BlockingQueue<Subscriber> subscribers = new LinkedBlockingQueue<Subscriber>();
-    private static final Object mutex = new Object();
+    private BlockingQueue<Subscriber> subscribers;
+    private BlockingQueue<MessageFile> messFiles;
+    private ExecutorService fileWriter = Executors.newCachedThreadPool();
     
-    Consumer(BlockingQueue q, BlockingQueue subs) {
+    
+    Consumer(BlockingQueue q, BlockingQueue subs, BlockingQueue mF) {
         queMessage = q;
         subscribers = subs;
+        messFiles = mF;
     }
     
     
