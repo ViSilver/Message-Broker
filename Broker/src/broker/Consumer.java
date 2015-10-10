@@ -4,6 +4,10 @@ import utils.Subscriber;
 import iasyncio.NetworkIO;
 import utils.Message;
 import utils.MessageFile;
+import utils.DeliveryConfirmationParameter;
+import utils.MessageParameter;
+import utils.PingParameter;
+import utils.SubscribtionParameter;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -11,10 +15,6 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Iterator;
-import utils.DeliveryConfirmationParameter;
-import utils.MessageParameter;
-import utils.PingParameter;
-import utils.SubscribtionParameter;
 
 public class Consumer implements Runnable {
     
@@ -53,7 +53,7 @@ public class Consumer implements Runnable {
     
     synchronized void sendMessage(Message mess, NetworkIO netWriter){
         // create a netWrite obj according to "to" param
-        String to = ((MessageParameter) mess.getParams()).getReceiver_id();
+        String to = ((MessageParameter) mess.getParams()).getReceiverID();
         Iterator<Subscriber> it = this.subscribers.iterator();
         
         if(this.subscribers.isEmpty()){
@@ -127,15 +127,15 @@ public class Consumer implements Runnable {
                     
                 case "mess":
                     messParam = (MessageParameter) message.getParams();
-                    System.out.println("Received a message: " + messParam.getMess_id());
+                    System.out.println("Received a message: " + messParam.getMessID());
                     sendMessage(message, netWriter);
                     
                     Message confirmation = new Message();
                     confirmation.setType("deliv_conf");
                     
                     DeliveryConfirmationParameter confParam = new DeliveryConfirmationParameter();
-                    confParam.setMess_id(messParam.getMess_id());
-                    confParam.setSender(messParam.getSender_id());
+                    confParam.setMess_id(messParam.getMessID());
+                    confParam.setSender(messParam.getSenderID());
                     confirmation.setParams(confParam);
                     
 //                    System.out.println("here");

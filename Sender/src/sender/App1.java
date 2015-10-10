@@ -4,6 +4,9 @@ import iasyncio.FileIO;
 import iasyncio.NetworkIO;
 import iasyncio.IAsyncIO;
 import utils.Message;
+import utils.DeliveryConfirmationParameter;
+import utils.MessageParameter;
+import utils.SubscribtionParameter;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -11,9 +14,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import utils.DeliveryConfirmationParameter;
-import utils.MessageParameter;
-import utils.SubscribtionParameter;
 
 public class App1 {
     
@@ -48,7 +48,7 @@ public class App1 {
                         confirmation.setType("deliv_conf");
                         
                         DeliveryConfirmationParameter confParams = new DeliveryConfirmationParameter();
-                        confParams.setMess_id(messParam.getMess_id());
+                        confParams.setMess_id(messParam.getMessID());
                         confParams.setSender("Broker");
                         confirmation.setParams(confParams);
                         
@@ -87,9 +87,9 @@ public class App1 {
                         message = queFile.take();
                         
                         messParam = new MessageParameter();
-                        messParam.setSender_id("App1");
-                        messParam.setReceiver_id("App2");
-                        messParam.setMess_id("0");
+                        messParam.setSenderID("App1");
+                        messParam.setReceiverID("App2");
+                        messParam.setMessID("0");
                 
                         message.setParams(messParam);
                         
@@ -132,7 +132,7 @@ public class App1 {
                             String location = "src/sender/mess" + messCounter + ".xml";
                             fileWrite.write(location, mess);
                         } else {
-                            System.out.println("Message " + ((MessageParameter) mess.getParams()).getMess_id() + " was confirmed");
+                            System.out.println("Message " + ((MessageParameter) mess.getParams()).getMessID() + " was confirmed");
                         }
                     } catch (InterruptedException ex) {
                         Logger.getLogger(App1.class.getName()).log(Level.SEVERE, null, ex);
@@ -141,8 +141,10 @@ public class App1 {
             }
         };
         
+        Thread listen = new Thread(listener);
+        listen.start();
+        
         executor.submit(reader);
-        executor.submit(listener);
         executor.submit(sender);
         executor.submit(writer);
     }

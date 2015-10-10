@@ -1,5 +1,7 @@
 package iasyncio;
 
+import utils.Message;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,12 +15,10 @@ import java.util.Scanner;
 //import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import utils.Message;
 
 public class FileIO implements IAsyncIO {
     
-    public FileIO() {
-    }
+    public FileIO() {}
     
     @Override
     public Message read(String location){

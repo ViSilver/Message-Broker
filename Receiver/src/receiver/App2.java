@@ -4,6 +4,9 @@ import iasyncio.FileIO;
 import iasyncio.NetworkIO;
 import iasyncio.IAsyncIO;
 import utils.Message;
+import utils.DeliveryConfirmationParameter;
+import utils.MessageParameter;
+import utils.SubscribtionParameter;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -11,9 +14,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import utils.DeliveryConfirmationParameter;
-import utils.MessageParameter;
-import utils.SubscribtionParameter;
 
 public class App2 {
 
@@ -49,7 +49,7 @@ public class App2 {
                         confirmation.setType("deliv_conf");
                         
                         DeliveryConfirmationParameter confParam = new DeliveryConfirmationParameter();
-                        confParam.setMess_id(messParam.getMess_id());
+                        confParam.setMess_id(messParam.getMessID());
                         confParam.setSender("Broker");
                         confirmation.setParams(confParam);
                         
@@ -93,9 +93,9 @@ public class App2 {
                         message = queFile.take();
 //                
                         messParam = new MessageParameter();
-                        messParam.setSender_id("App2");
-                        messParam.setReceiver_id("App1");
-                        messParam.setMess_id("0");
+                        messParam.setSenderID("App2");
+                        messParam.setReceiverID("App1");
+                        messParam.setMessID("0");
                 
                         message.setParams(messParam);
                         
@@ -150,7 +150,9 @@ public class App2 {
             }
         };
         
-        executor.submit(listener);
+        Thread listen = new Thread(listener);
+        listen.start();
+        
         executor.submit(writer); 
         executor.submit(sender);
         executor.submit(reader);

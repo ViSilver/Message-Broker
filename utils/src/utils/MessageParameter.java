@@ -2,31 +2,31 @@ package utils;
 
 public class MessageParameter extends Parameter{
 
-    private String mess_id;
-    private String sender_id;
-    private String receiver_id;
+    private String messID;
+    private String senderID;
+    private String receiverID;
 
-    public void setMess_id(String mess_id) {
-        this.mess_id = mess_id;
+    public void setMessID(String messID) {
+        this.messID = messID;
     }
 
-    public void setSender_id(String sender_id) {
-        this.sender_id = sender_id;
+    public void setSenderID(String senderID) {
+        this.senderID = senderID;
     }
 
-    public void setReceiver_id(String receiver_id) {
-        this.receiver_id = receiver_id;
+    public void setReceiverID(String receiverID) {
+        this.receiverID = receiverID;
     }
 
-    public String getMess_id() {
-        return mess_id;
+    public String getMessID() {
+        return messID;
     }
 
-    public String getSender_id() {
-        return sender_id;
+    public String getSenderID() {
+        return senderID;
     }
 
-    public String getReceiver_id() {
-        return receiver_id;
+    public String getReceiverID() {
+        return receiverID;
     }
 }

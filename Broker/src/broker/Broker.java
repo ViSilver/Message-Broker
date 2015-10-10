@@ -2,14 +2,14 @@ package broker;
 
 import utils.Subscriber;
 import utils.MessageFile;
+import utils.Message;
+import utils.Subscriber;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import utils.Message;
-import utils.Subscriber;
 
 public class Broker {
     
@@ -25,7 +25,8 @@ public class Broker {
         Runnable resender2 = new Consumer(queue, subscribers, messFiles);
         Runnable messageChecker = new MessageChecker(messFiles);
         
-        executor.submit(listener);
+        Thread list = new Thread(listener);
+        list.start();
         executor.submit(resender1);
         executor.submit(resender2);
         executor.submit(messageChecker);
