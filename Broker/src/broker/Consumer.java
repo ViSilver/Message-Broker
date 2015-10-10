@@ -11,6 +11,10 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Iterator;
+import utils.DeliveryConfirmationParameter;
+import utils.MessageParameter;
+import utils.PingParameter;
+import utils.SubscribtionParameter;
 
 public class Consumer implements Runnable {
     
@@ -29,11 +33,11 @@ public class Consumer implements Runnable {
 //        return params;
 //    }
     
-    void subscribeApp(String[] params){
+    void subscribeApp(SubscribtionParameter params){
         
-        String appName = params[0];
-        String ip = params[1];
-        int port = Integer.parseInt(params[2]);
+        String appName = params.getApp_id();
+        String ip = params.getIp();
+        int port = params.getPort();
         
         Subscriber rcvr = new Subscriber(appName, port, ip);
         // store it into the list of receivers
@@ -49,7 +53,7 @@ public class Consumer implements Runnable {
     
     synchronized void sendMessage(Message mess, NetworkIO netWriter){
         // create a netWrite obj according to "to" param
-        String to = mess.getParams()[1];
+        String to = ((MessageParameter) mess.getParams()).getReceiver_id();
         Iterator<Subscriber> it = this.subscribers.iterator();
         
         if(this.subscribers.isEmpty()){
@@ -99,7 +103,10 @@ public class Consumer implements Runnable {
     @Override
     public void run() {
         Message message = new Message();
-        String[] params;
+        MessageParameter messParam;
+        DeliveryConfirmationParameter delivConfParam;
+        SubscribtionParameter subscribParam;
+        PingParameter pingParam;
         NetworkIO netWriter = new NetworkIO();
            
         while(true){
@@ -112,24 +119,26 @@ public class Consumer implements Runnable {
             }
             
             //implement some logic for processing the resending
-            
-            params = message.getParams();
             switch(message.getType()){
                 case "subscribe":
-                    subscribeApp(params);
+                    subscribParam = (SubscribtionParameter) message.getParams();
+                    subscribeApp(subscribParam);
                     break;
                     
                 case "mess":
-                    System.out.println("Received a message: " + params[1]);
+                    messParam = (MessageParameter) message.getParams();
+                    System.out.println("Received a message: " + messParam.getMess_id());
                     sendMessage(message, netWriter);
                     
                     Message confirmation = new Message();
                     confirmation.setType("deliv_conf");
-                    String[] confParams = new String[2];
-                    confParams[0] = params[2]; // mess id
-                    confParams[1] = params[0]; // sender id (sending back to it)
-                    confirmation.setParams(confParams);
-                    System.out.println("here");
+                    
+                    DeliveryConfirmationParameter confParam = new DeliveryConfirmationParameter();
+                    confParam.setMess_id(messParam.getMess_id());
+                    confParam.setSender(messParam.getSender_id());
+                    confirmation.setParams(confParam);
+                    
+//                    System.out.println("here");
                     
                     {
                         try {
@@ -145,10 +154,12 @@ public class Consumer implements Runnable {
                 case "ping":
                     // the broker replicat sends a ping
                     // to see if this instance is working
-                    pingResponse(params[1]);
+                    pingParam = (PingParameter) message.getParams();
+                    pingResponse(pingParam.getSender());
                     break;
                     
-                case "response": 
+                case "pong": 
+                    // receives a pong from the main broker
                     {
                         try {
                             Thread.sleep(30000);
@@ -161,13 +172,15 @@ public class Consumer implements Runnable {
                 case "deliv_conf":
                     // received a delivery confirmation
                     // from app about a sent message
-                    if(!message.getParams()[1].equals("Broker")){
-                        System.out.println("Deliver confirmation for: " + message.getParams()[0]);
+                    DeliveryConfirmationParameter param = (DeliveryConfirmationParameter) message.getParams();
+                    
+                    if(!param.getSender().equals("Broker")){
+                        System.out.println("Deliver confirmation for: " + param.getMess_id());
                         sendMessage(message, netWriter);
                     } else {
-                        System.out.println("The message " + message.getParams()[0] + " was delivered");
+                        System.out.println("The message " + param.getMess_id() + " was delivered");
                     }
-                    changeMessDelivStatus(params[1]);
+                    changeMessDelivStatus(param.getMess_id()); // it needs to send a MessageFile obj
                     break;
                     
                 default:

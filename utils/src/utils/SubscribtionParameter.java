@@ -1,6 +1,6 @@
 package utils;
 
-public class SubscriptionParameter extends Parameter{
+public class SubscribtionParameter extends Parameter{
     
     private String app_id;
     private String ip;

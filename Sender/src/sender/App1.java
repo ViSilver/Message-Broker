@@ -11,6 +11,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import utils.DeliveryConfirmationParameter;
+import utils.MessageParameter;
+import utils.SubscribtionParameter;
 
 public class App1 {
     
@@ -40,12 +43,13 @@ public class App1 {
                         //send confirmation back
                         queMessage.put(message);
                         
-                        String[] params = message.getParams();
+                        MessageParameter messParam = new MessageParameter();
                         
                         confirmation.setType("deliv_conf");
-                        String[] confParams = new String[2];
-                        confParams[0] = params[2]; // mess id
-                        confParams[1] = "Broker"; // sender id (sending back to it)
+                        
+                        DeliveryConfirmationParameter confParams = new DeliveryConfirmationParameter();
+                        confParams.setMess_id(messParam.getMess_id());
+                        confParams.setSender("Broker");
                         confirmation.setParams(confParams);
                         
                         netWrite.write("Broker", confirmation);
@@ -60,19 +64,18 @@ public class App1 {
             
             @Override
             public void run() {
-                // listen to the messages
                 NetworkIO netWrite = new NetworkIO();
                 netWrite.setPort(3000);
                 
-                // take the message from the queue
                 Message message = new Message();
-                String[] params = new String[3];
+                SubscribtionParameter subscrParam = new SubscribtionParameter();
+                MessageParameter messParam;
                 
                 message.setType("subscribe");
-                params[0] = "App1";
-                params[1] = "localhost";
-                params[2] = "3001"; 
-                message.setParams(params);
+                subscrParam.setApp_id("App1");
+                subscrParam.setIp("127.0.0.1");
+                subscrParam.setPort(3001);
+                message.setParams(subscrParam);
                 // try to send the subscription message 
                 
                 netWrite.write("Broker", message);
@@ -83,12 +86,12 @@ public class App1 {
                     try {
                         message = queFile.take();
                         
-                        params = new String[3];
-                        params[0] = "App1";     // From
-                        params[1] = "App2";     // To
-                        params[2] = "0";        // ID of message
+                        messParam = new MessageParameter();
+                        messParam.setSender_id("App1");
+                        messParam.setReceiver_id("App2");
+                        messParam.setMess_id("0");
                 
-                        message.setParams(params);
+                        message.setParams(messParam);
                         
                         System.out.println("Sending message");
                         netWrite.write("App2", message);
@@ -129,7 +132,7 @@ public class App1 {
                             String location = "src/sender/mess" + messCounter + ".xml";
                             fileWrite.write(location, mess);
                         } else {
-                            System.out.println("Message " + mess.getParams()[0] + " was confirmed");
+                            System.out.println("Message " + ((MessageParameter) mess.getParams()).getMess_id() + " was confirmed");
                         }
                     } catch (InterruptedException ex) {
                         Logger.getLogger(App1.class.getName()).log(Level.SEVERE, null, ex);

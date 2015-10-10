@@ -23,9 +23,11 @@ public class Broker {
         Runnable listener = new Producer(queue);
         Runnable resender1 = new Consumer(queue, subscribers, messFiles);
         Runnable resender2 = new Consumer(queue, subscribers, messFiles);
+        Runnable messageChecker = new MessageChecker(messFiles);
         
         executor.submit(listener);
         executor.submit(resender1);
         executor.submit(resender2);
+        executor.submit(messageChecker);
     }
 }

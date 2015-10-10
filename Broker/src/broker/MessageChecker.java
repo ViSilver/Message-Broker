@@ -36,6 +36,5 @@ public class MessageChecker implements Runnable{
                 }
             }
         }
-        
     }
 }

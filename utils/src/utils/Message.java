@@ -6,7 +6,7 @@ public class Message implements Serializable {
     
     private String type;
     private String body;
-    private String[] params;
+    private Parameter params;
     
     public Message(){
         type = null;
@@ -22,7 +22,7 @@ public class Message implements Serializable {
         this.body = body;
     }
 
-    public void setParams(String[] params) {
+    public void setParams(Parameter params) {
         this.params = params;
     }
 
@@ -34,7 +34,7 @@ public class Message implements Serializable {
         return body;
     }
 
-    public String[] getParams() {
+    public Parameter getParams() {
         return params;
     }
     
