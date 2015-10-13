@@ -17,10 +17,22 @@ public class Broker {
     static BlockingQueue<Subscriber> subscribers = new LinkedBlockingQueue();
     static BlockingQueue<MessageFile> messFiles = new LinkedBlockingQueue();
     private static ExecutorService executor = Executors.newCachedThreadPool();
+    private static boolean replica = false;
+    private final static int REPLICA_PORT = 2999;
+    private final static int MASTER_PORT = 3000;
+    
+    public Broker(boolean replica){
+        this.replica = replica;
+    }
 
     public static void main(String[] args) throws InterruptedException {
         
-        Runnable listener = new Producer(queue);
+        Runnable listener;
+        if(replica){
+            listener = new Producer(queue, REPLICA_PORT);
+        } else {
+            listener = new Producer(queue, MASTER_PORT);
+        }
         Runnable resender1 = new Consumer(queue, subscribers, messFiles);
         Runnable resender2 = new Consumer(queue, subscribers, messFiles);
         Runnable messageChecker = new MessageChecker(messFiles);

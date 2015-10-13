@@ -15,6 +15,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Iterator;
+import java.util.concurrent.Future;
 
 public class Consumer implements Runnable {
     
@@ -35,7 +36,7 @@ public class Consumer implements Runnable {
     
     void subscribeApp(SubscribtionParameter params){
         
-        String appName = params.getApp_id();
+        String appName = params.getAppID();
         String ip = params.getIp();
         int port = params.getPort();
         
@@ -134,8 +135,8 @@ public class Consumer implements Runnable {
                     confirmation.setType("deliv_conf");
                     
                     DeliveryConfirmationParameter confParam = new DeliveryConfirmationParameter();
-                    confParam.setMess_id(messParam.getMessID());
-                    confParam.setSender(messParam.getSenderID());
+                    confParam.setMessageID(messParam.getMessID());
+                    confParam.setSenderID(messParam.getSenderID());
                     confirmation.setParams(confParam);
                     
 //                    System.out.println("here");
@@ -149,13 +150,15 @@ public class Consumer implements Runnable {
                         }
                     }
                     
+//                    Future<Void> futureFile = new 
+                    
                     break;
                     
                 case "ping":
                     // the broker replicat sends a ping
                     // to see if this instance is working
                     pingParam = (PingParameter) message.getParams();
-                    pingResponse(pingParam.getSender());
+                    pingResponse(pingParam.getSenderID());
                     break;
                     
                 case "pong": 
@@ -174,13 +177,14 @@ public class Consumer implements Runnable {
                     // from app about a sent message
                     DeliveryConfirmationParameter param = (DeliveryConfirmationParameter) message.getParams();
                     
-                    if(!param.getSender().equals("Broker")){
-                        System.out.println("Deliver confirmation for: " + param.getMess_id());
+                    if(!param.getSenderID().equals("Broker")){
+                        System.out.println("Deliver confirmation for: " + param.getMessageID());
                         sendMessage(message, netWriter);
                     } else {
-                        System.out.println("The message " + param.getMess_id() + " was delivered");
+                        System.out.println("The message " + param.getMessageID() + " was delivered");
+//                        sendMessage(message, netWriter);
                     }
-                    changeMessDelivStatus(param.getMess_id()); // it needs to send a MessageFile obj
+                    changeMessDelivStatus(param.getMessageID()); // it needs to send a MessageFile obj
                     break;
                     
                 default:

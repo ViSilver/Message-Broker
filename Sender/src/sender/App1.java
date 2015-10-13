@@ -48,8 +48,8 @@ public class App1 {
                         confirmation.setType("deliv_conf");
                         
                         DeliveryConfirmationParameter confParams = new DeliveryConfirmationParameter();
-                        confParams.setMess_id(messParam.getMessID());
-                        confParams.setSender("Broker");
+                        confParams.setMessageID(messParam.getMessID());
+                        confParams.setSenderID("Broker");
                         confirmation.setParams(confParams);
                         
                         netWrite.write("Broker", confirmation);
@@ -72,7 +72,7 @@ public class App1 {
                 MessageParameter messParam;
                 
                 message.setType("subscribe");
-                subscrParam.setApp_id("App1");
+                subscrParam.setAppID("App1");
                 subscrParam.setIp("127.0.0.1");
                 subscrParam.setPort(3001);
                 message.setParams(subscrParam);

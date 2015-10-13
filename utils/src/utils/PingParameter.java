@@ -2,14 +2,14 @@ package utils;
 
 public class PingParameter extends Parameter{
     
-    private String sender;
+    private String senderID;
 
-    public void setSender(String sender) {
-        this.sender = sender;
+    public void setSenderID(String senderID) {
+        this.senderID = senderID;
     }
 
-    public String getSender() {
-        return sender;
+    public String getSenderID() {
+        return senderID;
     }
     
 }

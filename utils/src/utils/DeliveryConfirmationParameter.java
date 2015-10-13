@@ -2,22 +2,22 @@ package utils;
 
 public class DeliveryConfirmationParameter extends Parameter{
     
-    private String mess_id;
-    private String sender;
+    private String MessageID;
+    private String senderID;
 
-    public String getMess_id() {
-        return mess_id;
+    public String getMessageID() {
+        return MessageID;
     }
 
-    public String getSender() {
-        return sender;
+    public String getSenderID() {
+        return senderID;
     }
 
-    public void setMess_id(String mess_id) {
-        this.mess_id = mess_id;
+    public void setMessageID(String MessageID) {
+        this.MessageID = MessageID;
     }
 
-    public void setSender(String sender) {
-        this.sender = sender;
+    public void setSenderID(String senderID) {
+        this.senderID = senderID;
     }
 }

@@ -49,8 +49,8 @@ public class App2 {
                         confirmation.setType("deliv_conf");
                         
                         DeliveryConfirmationParameter confParam = new DeliveryConfirmationParameter();
-                        confParam.setMess_id(messParam.getMessID());
-                        confParam.setSender("Broker");
+                        confParam.setMessageID(messParam.getMessID());
+                        confParam.setSenderID("Broker");
                         confirmation.setParams(confParam);
                         
                         netWrite.write("Broker", confirmation);
@@ -78,7 +78,7 @@ public class App2 {
                 
                 message.setType("subscribe");
                 
-                subscrParam.setApp_id("App2");
+                subscrParam.setAppID("App2");
                 subscrParam.setIp("localhost");
                 subscrParam.setPort(3002);
                 
@@ -140,7 +140,7 @@ public class App2 {
                             fileWrite.write(location, mess);
                         } else {
                             System.out.println("Message " + 
-                                    ((DeliveryConfirmationParameter) mess.getParams()).getMess_id() 
+                                    ((DeliveryConfirmationParameter) mess.getParams()).getMessageID() 
                                     + " was confirmed");
                         }
                     } catch (InterruptedException ex) {

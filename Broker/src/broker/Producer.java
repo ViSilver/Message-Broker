@@ -16,18 +16,20 @@ import java.util.logging.Logger;
 public class Producer implements Runnable{
     
     private BlockingQueue<Message> queue;
+    private int port;
 //    private BlockingQueue<Subscriber> subscribers = new LinkedBlockingQueue<Subscriber>();
 //    private ExecutorService executor = Executors.newCachedThreadPool();
     
-    Producer(BlockingQueue q){
+    Producer(BlockingQueue q, int port){
         queue = q;
+        this.port = port;
     }
 
     @Override
     public void run() {
         // listen to the messages
         NetworkIO netRead = new NetworkIO();
-        netRead.setPort(3000);
+        netRead.setPort(this.port);
         IAsyncIO fileRead = new FileIO();
         
         Message mess;

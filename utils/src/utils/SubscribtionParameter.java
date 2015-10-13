@@ -2,12 +2,12 @@ package utils;
 
 public class SubscribtionParameter extends Parameter{
     
-    private String app_id;
+    private String appID;
     private String ip;
     private int port;
 
-    public String getApp_id() {
-        return app_id;
+    public String getAppID() {
+        return appID;
     }
 
     public String getIp() {
@@ -18,8 +18,8 @@ public class SubscribtionParameter extends Parameter{
         return port;
     }
 
-    public void setApp_id(String app_id) {
-        this.app_id = app_id;
+    public void setAppID(String appID) {
+        this.appID = appID;
     }
 
     public void setIp(String ip) {
