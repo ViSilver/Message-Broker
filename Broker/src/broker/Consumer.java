@@ -1,5 +1,6 @@
 package broker;
 
+import iasyncio.FileIO;
 import utils.Subscriber;
 import iasyncio.NetworkIO;
 import utils.Message;
@@ -15,6 +16,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Iterator;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 public class Consumer implements Runnable {
@@ -109,6 +111,7 @@ public class Consumer implements Runnable {
         SubscribtionParameter subscribParam;
         PingParameter pingParam;
         NetworkIO netWriter = new NetworkIO();
+        FileIO fileWrite = new FileIO();
            
         while(true){
             try {
@@ -150,8 +153,31 @@ public class Consumer implements Runnable {
                         }
                     }
                     
-//                    Future<Void> futureFile = new 
+                    MessageFile messFile = new MessageFile();
+                    messFile.setParams(messParam);
+                    messFile.setDelivered(false);
                     
+                    final String filePath = "src/broker/" + messParam.getSenderID() 
+                            + "_" + messParam.getMessID() + ".xml";
+                    
+                    final Message copyMessage = message;
+                    
+                    Callable<Void> callable;
+                    callable = new Callable<Void>() {
+
+                        @Override
+                        public Void call() throws Exception {
+                            
+                            fileWrite.write(filePath, copyMessage);
+                            return null;
+                            
+                        }
+                    };
+                    
+                    Future<Void> futureFile = fileWriter.submit(callable);
+                    
+                    messFile.setFilePath(filePath);
+                    messFile.setFileWrite(futureFile);
                     break;
                     
                 case "ping":

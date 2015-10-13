@@ -136,7 +136,7 @@ public class App2 {
                         Message mess = queMessage.take();
                         if(!mess.getType().equals("deliv_conf")){
                             messCounter++;
-                            String location = "src/sender/mess" + messCounter + ".xml";
+                            String location = "src/receiver/mess" + messCounter + ".xml";
                             fileWrite.write(location, mess);
                         } else {
                             System.out.println("Message " + 
