@@ -85,8 +85,22 @@ public class Consumer implements Runnable {
     }
     
     
-    void changeMessDelivStatus(String data){
+    void changeMessDelivStatus(DeliveryConfirmationParameter param){
         
+        String messID = param.getMessageID();
+        String senderID = param.getSenderID();
+        
+        Iterator<MessageFile> it = messFiles.iterator();
+        
+        while(it.hasNext()){
+            MessageFile messFile = it.next();
+            MessageParameter messParam = messFile.getParams();
+            
+            if(messParam.getSenderID().equals(senderID) 
+                    && messParam.getMessID().equals(messID)){
+                messFile.setDelivered(true); // this might not work
+            }
+        }
     }
     
 
@@ -210,7 +224,7 @@ public class Consumer implements Runnable {
                         System.out.println("The message " + param.getMessageID() + " was delivered");
 //                        sendMessage(message, netWriter);
                     }
-                    changeMessDelivStatus(param.getMessageID()); // it needs to send a MessageFile obj
+                    changeMessDelivStatus(param); // it needs to send a MessageFile obj
                     break;
                     
                 default:
