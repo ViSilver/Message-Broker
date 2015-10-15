@@ -99,6 +99,8 @@ public class Consumer implements Runnable {
             if(messParam.getSenderID().equals(senderID) 
                     && messParam.getMessID().equals(messID)){
                 messFile.setDelivered(true); // this might not work
+                // remove messFile from queue
+                // add the new messFile to queue
             }
         }
     }
