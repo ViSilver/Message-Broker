@@ -18,10 +18,10 @@ import java.util.logging.Logger;
 import java.util.Iterator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class Consumer implements Runnable {
-    
-    
+
 //    String[] getParam(String s) {
 //        
 //        String[] params = new String[2];
@@ -35,13 +35,12 @@ public class Consumer implements Runnable {
 //                
 //        return params;
 //    }
-    
-    void subscribeApp(SubscribtionParameter params){
-        
+    void subscribeApp(SubscribtionParameter params) {
+
         String appName = params.getAppID();
         String ip = params.getIp();
         int port = params.getPort();
-        
+
         Subscriber rcvr = new Subscriber(appName, port, ip);
         // store it into the list of receivers
         try {
@@ -52,73 +51,68 @@ public class Consumer implements Runnable {
             Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    
-    synchronized void sendMessage(Message mess, NetworkIO netWriter){
+
+    synchronized void sendMessage(Message mess, NetworkIO netWriter) {
         // create a netWrite obj according to "to" param
         String to = ((MessageParameter) mess.getParams()).getReceiverID();
         Iterator<Subscriber> it = this.subscribers.iterator();
-        
-        if(this.subscribers.isEmpty()){
+
+        if (this.subscribers.isEmpty()) {
             System.out.println("The subs q is empty");
         }
-        
-        while(it.hasNext()){
+
+        while (it.hasNext()) {
             Subscriber sub = it.next();
             System.out.println(sub.name);
-            if(to.equals(sub.name)){
+            if (to.equals(sub.name)) {
                 netWriter.setPort(sub.port);
                 netWriter.write(to, mess);
                 System.out.println("Resending the message to " + to);
                 return;
             }
         }
-        
+
         // save the message into a file
         System.out.println("The receiver wasn't found.");
     }
-    
-    
-    void pingResponse(String data){
-        // it receives a string of the form
-        // "(from:id,port2)"
-    }
-    
-    
-    void changeMessDelivStatus(DeliveryConfirmationParameter param){
+
+    void pingResponse(String data) {
         
+    }
+
+    void changeMessDelivStatus(DeliveryConfirmationParameter param) {
+
         String messID = param.getMessageID();
         String senderID = param.getSenderID();
-        
+
         Iterator<MessageFile> it = messFiles.iterator();
-        
-        while(it.hasNext()){
+
+        while (it.hasNext()) {
             MessageFile messFile = it.next();
             MessageParameter messParam = messFile.getParams();
-            
-            if(messParam.getSenderID().equals(senderID) 
-                    && messParam.getMessID().equals(messID)){
+
+            if (messParam.getSenderID().equals(senderID)
+                    && messParam.getMessID().equals(messID)) {
                 messFile.setDelivered(true); // this might not work
                 // remove messFile from queue
                 // add the new messFile to queue
             }
         }
     }
-    
 
     private BlockingQueue<Message> queMessage;
     private BlockingQueue<Subscriber> subscribers;
     private BlockingQueue<MessageFile> messFiles;
     private ExecutorService fileWriter = Executors.newCachedThreadPool();
-    
-    
-    Consumer(BlockingQueue q, BlockingQueue subs, BlockingQueue mF) {
+    private boolean replica;
+
+    Consumer(BlockingQueue q, BlockingQueue subs, BlockingQueue mF, boolean replica) {
         queMessage = q;
         subscribers = subs;
         messFiles = mF;
+        this.replica = replica;
     }
-    
-    
+
     @Override
     public void run() {
         Message message = new Message();
@@ -128,107 +122,113 @@ public class Consumer implements Runnable {
         PingParameter pingParam;
         NetworkIO netWriter = new NetworkIO();
         FileIO fileWrite = new FileIO();
-           
-        while(true){
-            try {
-//          Thread.sleep(10000);
-                message = queMessage.take();
-//                System.out.println("Retrieving from message queue");
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Broker.class.getName()).log(Level.SEVERE, null, ex);
+
+        while (true) {
+
+            if (!replica) {
+                try {
+                    message = queMessage.take();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Broker.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                try {
+                    message = queMessage.poll(30, TimeUnit.SECONDS);
+                } catch (InterruptedException ex) {
+                    System.out.println("Master is not responding. "
+                            + "Switching to master's channel");
+                    netWriter.setPort(2999);
+                    message.setType("change_port");
+                    netWriter.write("localhost", message);
+                }
             }
-            
-            //implement some logic for processing the resending
-            switch(message.getType()){
+
+            switch (message.getType()) {
                 case "subscribe":
                     subscribParam = (SubscribtionParameter) message.getParams();
                     subscribeApp(subscribParam);
                     break;
-                    
+
                 case "mess":
                     messParam = (MessageParameter) message.getParams();
                     System.out.println("Received a message: " + messParam.getMessID());
                     sendMessage(message, netWriter);
-                    
+
                     Message confirmation = new Message();
                     confirmation.setType("deliv_conf");
-                    
+
                     DeliveryConfirmationParameter confParam = new DeliveryConfirmationParameter();
                     confParam.setMessageID(messParam.getMessID());
                     confParam.setSenderID(messParam.getSenderID());
                     confirmation.setParams(confParam);
-                    
-//                    System.out.println("here");
-                    
+
                     {
                         try {
                             queMessage.put(confirmation);
-                            
+
                         } catch (InterruptedException ex) {
                             Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
-                    
+
                     MessageFile messFile = new MessageFile();
                     messFile.setParams(messParam);
                     messFile.setDelivered(false);
-                    
-                    final String filePath = "src/broker/" + messParam.getSenderID() 
+
+                    final String filePath = "src/broker/" + messParam.getSenderID()
                             + "_" + messParam.getMessID() + ".xml";
-                    
+
                     final Message copyMessage = message;
-                    
+
                     Callable<Void> callable;
                     callable = new Callable<Void>() {
 
                         @Override
                         public Void call() throws Exception {
-                            
+
                             fileWrite.write(filePath, copyMessage);
                             return null;
-                            
+
                         }
                     };
-                    
+
                     Future<Void> futureFile = fileWriter.submit(callable);
-                    
+
                     messFile.setFilePath(filePath);
                     messFile.setFileWrite(futureFile);
                     break;
-                    
+
                 case "ping":
                     // the broker replicat sends a ping
                     // to see if this instance is working
                     pingParam = (PingParameter) message.getParams();
                     pingResponse(pingParam.getSenderID());
                     break;
-                    
-                case "pong": 
-                    // receives a pong from the main broker
-                    {
-                        try {
-                            Thread.sleep(30000);
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+
+                case "pong": // receives a pong from the main broker
+                {
+                    try {
+                        Thread.sleep(60000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    break;
-                    
+                }
+                break;
+
                 case "deliv_conf":
                     // received a delivery confirmation
                     // from app about a sent message
                     DeliveryConfirmationParameter param = (DeliveryConfirmationParameter) message.getParams();
-                    
-                    if(!param.getSenderID().equals("Broker")){
+
+                    if (!param.getSenderID().equals("Broker")) {
                         System.out.println("Deliver confirmation for: " + param.getMessageID());
                         sendMessage(message, netWriter);
                     } else {
                         System.out.println("The message " + param.getMessageID() + " was delivered");
-//                        sendMessage(message, netWriter);
                     }
-                    changeMessDelivStatus(param); // it needs to send a MessageFile obj
+                    changeMessDelivStatus(param); 
                     break;
-                    
+
                 default:
                     break;
             }

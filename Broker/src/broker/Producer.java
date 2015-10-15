@@ -10,17 +10,20 @@ import java.util.concurrent.BlockingQueue;
 //import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import utils.MessageParameter;
 
 public class Producer implements Runnable{
     
     private BlockingQueue<Message> queue;
     private int port;
+    private boolean replica;
 //    private BlockingQueue<Subscriber> subscribers = new LinkedBlockingQueue<Subscriber>();
 //    private ExecutorService executor = Executors.newCachedThreadPool();
     
-    Producer(BlockingQueue q, int port){
+    Producer(BlockingQueue q, int port, boolean replica){
         queue = q;
         this.port = port;
+        this.replica = replica;
     }
 
     @Override
@@ -36,8 +39,12 @@ public class Producer implements Runnable{
             while(true) {
                 mess = netRead.read("localhost");
 //                System.out.println("Inserting the message into the queue: " + mess);
-                // here is the deadlock
-                queue.put(mess);
+                if(!mess.getType().equals("change_port")){
+                    queue.put(mess);
+                } else {
+                    this.port = 3000;
+                    netRead.setPort(port);
+                }
             }
         } catch (InterruptedException ex) {
             Logger.getLogger(Broker.class.getName()).log(Level.SEVERE, null, ex);

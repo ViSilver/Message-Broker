@@ -29,12 +29,16 @@ public class Broker {
         
         Runnable listener;
         if(replica){
-            listener = new Producer(queue, REPLICA_PORT);
+            // replica listener
+            listener = new Producer(queue, REPLICA_PORT, replica);
         } else {
-            listener = new Producer(queue, MASTER_PORT);
+            // master listener
+            listener = new Producer(queue, MASTER_PORT, replica);
         }
-        Runnable resender1 = new Consumer(queue, subscribers, messFiles);
-        Runnable resender2 = new Consumer(queue, subscribers, messFiles);
+        
+        Runnable resender1 = new Consumer(queue, subscribers, messFiles, replica);
+        Runnable resender2 = new Consumer(queue, subscribers, messFiles, replica);
+        
         Runnable messageChecker = new MessageChecker(messFiles);
         
         Thread list = new Thread(listener);
