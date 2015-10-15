@@ -1,5 +1,7 @@
 package broker;
 
+
+import org.json.JSONObject;
 import iasyncio.FileIO;
 import utils.Subscriber;
 import iasyncio.NetworkIO;
@@ -19,6 +21,9 @@ import java.util.Iterator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import org.json.JSONException;
+import org.json.XML;
+
 
 public class Consumer implements Runnable {
 
@@ -42,18 +47,14 @@ public class Consumer implements Runnable {
         int port = params.getPort();
 
         Subscriber rcvr = new Subscriber(appName, port, ip);
-        // store it into the list of receivers
         try {
-//            System.out.println("Received a subscription from: " + appName);
             this.subscribers.put(rcvr);
-//            System.out.println("Subscribed app: " + rcvr.name);
         } catch (InterruptedException ex) {
             Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     synchronized void sendMessage(Message mess, NetworkIO netWriter) {
-        // create a netWrite obj according to "to" param
         String to = ((MessageParameter) mess.getParams()).getReceiverID();
         Iterator<Subscriber> it = this.subscribers.iterator();
 
@@ -176,9 +177,21 @@ public class Consumer implements Runnable {
                     messFile.setDelivered(false);
 
                     final String filePath = "src/broker/" + messParam.getSenderID()
-                            + "_" + messParam.getMessID() + ".xml";
+                            + "_" + messParam.getMessID() + ".json";
 
-                    final Message copyMessage = message;
+                    Message copyMessage = message;
+                    String body = message.getBody();
+                    
+                    try {
+                        JSONObject xmlJSONObj = XML.toJSONObject(body);
+                        body = xmlJSONObj.toString(4);
+                        System.out.println(body);
+                    } catch (JSONException je) {
+                        System.out.println(je.toString());
+                    }
+                    
+                    copyMessage.setBody(body);
+                    final Message finalMessage = copyMessage;
 
                     Callable<Void> callable;
                     callable = new Callable<Void>() {
@@ -186,7 +199,7 @@ public class Consumer implements Runnable {
                         @Override
                         public Void call() throws Exception {
 
-                            fileWrite.write(filePath, copyMessage);
+                            fileWrite.write(filePath, finalMessage);
                             return null;
 
                         }
