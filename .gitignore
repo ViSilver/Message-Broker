@@ -19,3 +19,12 @@ nbproject/
 
 # OS X files
 .DS_Store
+
+# Intellij IDEA 
+.idea/
+**/.idea/
+**/**/.idea/
+*.iml
+**/*.iml
+**/**/*.iml
+.gradle/

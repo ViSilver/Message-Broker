@@ -1,0 +1,6 @@
+{"employees": "src/main/json/clients1.json",
+  "location": {
+    "ip": "127.0.0.1",
+    "port": 33333
+  }
+}
