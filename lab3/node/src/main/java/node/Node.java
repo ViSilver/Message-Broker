@@ -3,6 +3,7 @@ package node;
 import discovery.DiscoveryListener;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import transport.TransportListener;
 import transport.connector.TransportConnectorListener;
 import transport.external.TransportExternalListener;
 import common.MulticastConfig;
@@ -25,7 +26,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 public class Node {
     public static void main(String[] args) {
         int mavenServerPort = 5555;
-        int dataServerPort = 4444;
         ArrayList<Integer> neighbourPorts = new ArrayList<>();
         String empLocation = "";
 
@@ -38,7 +38,6 @@ public class Node {
                 json = (JSONObject) json.get("node");
 
                 mavenServerPort = json.getInt("maven port");
-                dataServerPort = json.getInt("connector port");
                 empLocation = json.get("employee Location").toString();
                 JSONArray arr = (JSONArray) json.get("neighbours");
 
@@ -63,17 +62,11 @@ public class Node {
                 .start();
 
         TransportExternalListener transportListener =
-                new TransportExternalListener(mavenServerPort, neighbourLocations);
+                new TransportExternalListener(mavenServerPort, neighbourLocations, empLocation);
         transportListener.start();
 
-        TransportConnectorListener connectorListener =
-                new TransportConnectorListener(
-                        new InetSocketAddress("127.0.0.1", dataServerPort),
-                        empLocation);
-        connectorListener.start();
-
         try {
-            Thread.sleep(SECONDS.toMillis(100));
+            Thread.sleep(SECONDS.toMillis(10));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
