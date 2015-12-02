@@ -3,7 +3,7 @@ package client;
 import discovery.DiscoveryClient;
 import common.Employee;
 import common.Location;
-import transport.external.TransportExternalClient;
+import transport.TransportClient;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -29,8 +29,8 @@ public class Client {
 
             if (location != null) {
                 showFiltered(
-                        new TransportExternalClient()
-                                .getEmployeesFrom(location));
+                        new TransportClient()
+                                .getEmployeesFrom(location, "client"));
             }
 
         } catch (IOException e) {

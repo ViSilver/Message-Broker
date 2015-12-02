@@ -4,16 +4,12 @@ import discovery.DiscoveryListener;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import transport.TransportListener;
-import transport.connector.TransportConnectorListener;
-import transport.external.TransportExternalListener;
-import common.MulticastConfig;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.function.Consumer;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -45,7 +41,7 @@ public class Node {
                     neighbourPorts.add(arr.getInt(i));
                 }
             } catch (IOException ex) {
-                System.out.println(ex);
+                ex.printStackTrace();
             }
         }
 
@@ -61,8 +57,8 @@ public class Node {
         new DiscoveryListener(serverLocation)
                 .start();
 
-        TransportExternalListener transportListener =
-                new TransportExternalListener(mavenServerPort, neighbourLocations, empLocation);
+        TransportListener transportListener =
+                new TransportListener(new InetSocketAddress("127.0.0.1", mavenServerPort), empLocation, neighbourLocations);
         transportListener.start();
 
         try {
@@ -70,7 +66,5 @@ public class Node {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-        transportListener.setStopped(true);
     }
 }

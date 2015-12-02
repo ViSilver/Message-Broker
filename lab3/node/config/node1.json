@@ -1,6 +1,5 @@
 {"node": {
   "employee Location": "src/main/json/employees1.json",
   "maven port": 5555,
-  "neighbours": [5556, 5557],
-  "connector port": 5555
+  "neighbours": [5556, 5557]
 }}
