@@ -43,33 +43,26 @@ public class TransportListener extends Thread {
                 ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
                 String caller = (String) ois.readObject();
 
-                ArrayList<Employee> arrayEmployees = null;
-
                 if (caller.equals("client")) {
                     System.out.println("[INFO] -----------------------------------------\n" +
                             "[INFO] Received employee request from client ...");
-                    arrayEmployees = getEmployees();
+                    Employees listEmployees = new Employees(getEmployees());
 
-                    OutputStream os = new FileOutputStream(
-                            new File("employees_" + Integer.toString(address.getPort()) + ".xml")
-                    );
+//                    OutputStream os = new FileOutputStream(
+//                            new File("employees_" + Integer.toString(address.getPort()) + ".xml")
+//                    );
 
-                    Employees listEmployees = new Employees(arrayEmployees);
                     XMLSerializer xmlSerializer = new XMLSerializer();
                     xmlSerializer.serialize(listEmployees, sock.getOutputStream());
 
                 } else if (caller.equals("maven")){
                     System.out.println("[INFO] -----------------------------------------\n" +
                             "[INFO] Received employee request from maven ...");
-                    arrayEmployees = getEmployeesFromFile();
+                    Employees listEmployees = new Employees(getEmployeesFromFile());
 
-                    Employees listEmployees = new Employees(arrayEmployees);
                     JsonSerializer jsonSerializer = new JsonSerializer();
                     jsonSerializer.serialize(listEmployees, sock.getOutputStream());
                 }
-
-//                ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
-//                oos.writeObject(arrayEmployees);
 
                 sock.close();
             }

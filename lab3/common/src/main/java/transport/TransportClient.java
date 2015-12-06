@@ -36,11 +36,9 @@ public class TransportClient {
         if (caller.equals("client")) {
             XMLSerializer xmlSerializer = new XMLSerializer();
             emps = xmlSerializer.deserialize(sock.getInputStream());
-            System.out.println(emps);
         } else if (caller.equals("maven")) {
             JsonSerializer jsonSerializer = new JsonSerializer();
             emps = jsonSerializer.deserialize(sock.getInputStream());
-            System.out.println(emps);
         }
 
         sock.close();
