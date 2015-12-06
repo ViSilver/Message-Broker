@@ -6,10 +6,9 @@ import common.Employees;
 import common.Location;
 import serialization.JsonSerializer;
 import serialization.XMLSerializer;
+import serialization.XSDValidator;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 
@@ -22,20 +21,23 @@ public class TransportClient {
         ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
         oos.writeObject(caller);
 
-//        ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
-//        ArrayList<Employee> employees = null;
-//        try {
-//            employees = (ArrayList<Employee>) ois.readObject();
-//        } catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-//        }
-
-
         Employees emps = null;
 
         if (caller.equals("client")) {
             XMLSerializer xmlSerializer = new XMLSerializer();
             emps = xmlSerializer.deserialize(sock.getInputStream());
+            OutputStream os = new FileOutputStream(
+                    new File("employees_" + Integer.toString(location.getLocation().getPort()) + ".xml")
+            );
+            xmlSerializer.serialize(emps, os);
+
+            boolean isValid = XSDValidator.validateXMLSchema(
+                    "schema.xsd",
+                    "employees_" + Integer.toString(location.getLocation().getPort()) + ".xml");
+
+            System.out.println("[INFO] -----------------------------------------------\n" +
+                    "[INFO]Is the given XML validated? -> " + Boolean.toString(isValid));
+
         } else if (caller.equals("maven")) {
             JsonSerializer jsonSerializer = new JsonSerializer();
             emps = jsonSerializer.deserialize(sock.getInputStream());

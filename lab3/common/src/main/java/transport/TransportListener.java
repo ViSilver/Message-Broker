@@ -48,11 +48,12 @@ public class TransportListener extends Thread {
                             "[INFO] Received employee request from client ...");
                     Employees listEmployees = new Employees(getEmployees());
 
-//                    OutputStream os = new FileOutputStream(
-//                            new File("employees_" + Integer.toString(address.getPort()) + ".xml")
-//                    );
+                    OutputStream os = new FileOutputStream(
+                            new File("employees_" + Integer.toString(address.getPort()) + ".xml")
+                    );
 
                     XMLSerializer xmlSerializer = new XMLSerializer();
+                    xmlSerializer.serialize(listEmployees, os);
                     xmlSerializer.serialize(listEmployees, sock.getOutputStream());
 
                 } else if (caller.equals("maven")){
