@@ -3,22 +3,16 @@ package transport;
 import common.Employee;
 import common.Employees;
 import common.Location;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import serialization.XMLSerializer;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import java.io.File;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.*;
 
@@ -55,9 +49,16 @@ public class TransportListener extends Thread {
                             "[INFO] Received employee request from client ...");
                     arrayEmployees = getEmployees();
 
+                    OutputStream os = new FileOutputStream(
+                            new File("employees_" + Integer.toString(address.getPort()) + ".xml")
+                    );
+
                     Employees listEmployees = new Employees(arrayEmployees);
                     XMLSerializer xmlSerializer = new XMLSerializer();
-                    xmlSerializer.serialize(listEmployees, "employees_" + Integer.toString(address.getPort()) + ".xml" );
+                    xmlSerializer.serialize(
+                            listEmployees,
+                            os
+                    );
 
                 } else if (caller.equals("maven")){
                     System.out.println("[INFO] -----------------------------------------\n" +

@@ -1,12 +1,12 @@
 package serialization;
 
 
-import common.Employee;
 import common.Employees;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public interface Serializer {
-    public void serialize(Employees employees, String filePath);
+    public void serialize(Employees employees, OutputStream os);
+    public Employees deserialize(InputStream is);
 }
