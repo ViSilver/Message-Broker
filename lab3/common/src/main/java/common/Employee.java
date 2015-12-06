@@ -3,8 +3,11 @@ package common;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
+@XmlRootElement
 public class Employee implements Serializable {
     private static final long serialVersionUID = 1L;
     private String firstName;
@@ -37,6 +40,7 @@ public class Employee implements Serializable {
         return firstName;
     }
 
+    @XmlElement
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -45,6 +49,7 @@ public class Employee implements Serializable {
         return lastName;
     }
 
+    @XmlElement
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
@@ -53,6 +58,7 @@ public class Employee implements Serializable {
         return department;
     }
 
+    @XmlElement
     public void setDepartment(String department) {
         this.department = department;
     }
@@ -61,6 +67,7 @@ public class Employee implements Serializable {
         return salary;
     }
 
+    @XmlElement
     public void setSalary(Double salary) {
         this.salary = salary;
     }

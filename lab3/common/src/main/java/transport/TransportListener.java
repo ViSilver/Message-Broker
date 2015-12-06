@@ -1,10 +1,15 @@
 package transport;
 
 import common.Employee;
+import common.Employees;
 import common.Location;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import serialization.XMLSerializer;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -13,6 +18,7 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.*;
 
@@ -21,6 +27,7 @@ public class TransportListener extends Thread {
     private ServerSocket serverSocket;
     private String empLocation;
     private ArrayList<InetSocketAddress> neighbours;
+    private boolean isStopped = false;
 
     public TransportListener(InetSocketAddress address, String empLocation, ArrayList<InetSocketAddress> neighbours) {
         this.address = address;
@@ -28,31 +35,41 @@ public class TransportListener extends Thread {
         this.neighbours = neighbours;
     }
 
+    public void setStopped (boolean state) {isStopped = state;}
+
     @Override
     public void run() {
 
         try {
-            serverSocket = new ServerSocket(address.getPort());
-            Socket sock = serverSocket.accept();
+            while (!isStopped) {
+                serverSocket = new ServerSocket(address.getPort());
+                Socket sock = serverSocket.accept();
 
-            ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
-            String caller = (String) ois.readObject();
+                ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
+                String caller = (String) ois.readObject();
 
-            ArrayList<Employee> arrayEmployees = null;
+                ArrayList<Employee> arrayEmployees = null;
 
-            if (caller.equals("client")) {
-                System.out.println("[INFO] -----------------------------------------\n" +
-                        "[INFO] Received employee request from client ...");
-                arrayEmployees = getEmployees();
+                if (caller.equals("client")) {
+                    System.out.println("[INFO] -----------------------------------------\n" +
+                            "[INFO] Received employee request from client ...");
+                    arrayEmployees = getEmployees();
 
-            } else {
-                System.out.println("[INFO] -----------------------------------------\n" +
-                        "[INFO] Received employee request from maven ...");
-                arrayEmployees = getEmployeesFromFile();
+                    Employees listEmployees = new Employees(arrayEmployees);
+                    XMLSerializer xmlSerializer = new XMLSerializer();
+                    xmlSerializer.serialize(listEmployees, "employees_" + Integer.toString(address.getPort()) + ".xml" );
+
+                } else if (caller.equals("maven")){
+                    System.out.println("[INFO] -----------------------------------------\n" +
+                            "[INFO] Received employee request from maven ...");
+                    arrayEmployees = getEmployeesFromFile();
+                }
+
+                ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
+                oos.writeObject(arrayEmployees);
+
+                sock.close();
             }
-
-            ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
-            oos.writeObject(arrayEmployees);
 
         } catch (IOException ex) {
             ex.printStackTrace();

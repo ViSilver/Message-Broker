@@ -66,5 +66,7 @@ public class Node {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        transportListener.setStopped(true);
     }
 }
