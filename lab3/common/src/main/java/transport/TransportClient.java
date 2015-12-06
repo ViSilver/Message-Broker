@@ -2,7 +2,10 @@ package transport;
 
 
 import common.Employee;
+import common.Employees;
 import common.Location;
+import serialization.JsonSerializer;
+import serialization.XMLSerializer;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -19,16 +22,29 @@ public class TransportClient {
         ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
         oos.writeObject(caller);
 
-        ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
-        ArrayList<Employee> employees = null;
-        try {
-            employees = (ArrayList<Employee>) ois.readObject();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+//        ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
+//        ArrayList<Employee> employees = null;
+//        try {
+//            employees = (ArrayList<Employee>) ois.readObject();
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
+
+
+        Employees emps = null;
+
+        if (caller.equals("client")) {
+            XMLSerializer xmlSerializer = new XMLSerializer();
+            emps = xmlSerializer.deserialize(sock.getInputStream());
+            System.out.println(emps);
+        } else if (caller.equals("maven")) {
+            JsonSerializer jsonSerializer = new JsonSerializer();
+            emps = jsonSerializer.deserialize(sock.getInputStream());
+            System.out.println(emps);
         }
 
         sock.close();
 
-        return employees;
+        return emps;
     }
 }

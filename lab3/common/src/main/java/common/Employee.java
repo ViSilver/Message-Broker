@@ -100,17 +100,31 @@ public class Employee implements Serializable {
     }
 
     public String toJSONString() {
-        return "{" +
-                "firstname: " + firstName +
-                ",lastname:" + lastName +
-                ",deppartment" + department +
-                ",salary" + salary +
-                "}";
+        JSONObject json = new JSONObject();
+
+        json.put("firstname", firstName);
+        json.put("lastname", lastName);
+        json.put("department", department);
+        json.put("salary", salary);
+
+        return json.toString();
     }
 
     public JSONObject toJSON() {
         JSONObject json = new JSONObject();
-        json.put("Employee", this.toJSONString());
+        json.put("Employee", new JSONObject(this.toJSONString()));
         return json;
+    }
+
+    public static Employee fromJSON(JSONObject jsonObject) {
+
+        Employee emp = new Employee();
+
+        emp.setFirstName(jsonObject.getString("firstname"));
+        emp.setLastName(jsonObject.getString("lastname"));
+        emp.setDepartment(jsonObject.getString("department"));
+        emp.setSalary(jsonObject.getDouble("salary"));
+
+        return emp;
     }
 }

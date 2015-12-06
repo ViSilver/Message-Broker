@@ -3,6 +3,7 @@ package transport;
 import common.Employee;
 import common.Employees;
 import common.Location;
+import serialization.JsonSerializer;
 import serialization.XMLSerializer;
 
 import org.json.JSONArray;
@@ -55,27 +56,26 @@ public class TransportListener extends Thread {
 
                     Employees listEmployees = new Employees(arrayEmployees);
                     XMLSerializer xmlSerializer = new XMLSerializer();
-                    xmlSerializer.serialize(
-                            listEmployees,
-                            os
-                    );
+                    xmlSerializer.serialize(listEmployees, sock.getOutputStream());
 
                 } else if (caller.equals("maven")){
                     System.out.println("[INFO] -----------------------------------------\n" +
                             "[INFO] Received employee request from maven ...");
                     arrayEmployees = getEmployeesFromFile();
+
+                    Employees listEmployees = new Employees(arrayEmployees);
+                    JsonSerializer jsonSerializer = new JsonSerializer();
+                    jsonSerializer.serialize(listEmployees, sock.getOutputStream());
                 }
 
-                ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
-                oos.writeObject(arrayEmployees);
+//                ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
+//                oos.writeObject(arrayEmployees);
 
                 sock.close();
             }
 
-        } catch (IOException ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             ex.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         }
     }
 
