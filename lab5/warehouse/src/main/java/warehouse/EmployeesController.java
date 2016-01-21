@@ -21,7 +21,7 @@ public class EmployeesController {
     private Headers headers;
     private InputStream in;
     private OutputStream out;
-    private DataStorage<Employee> storage;
+    private DataAccessObject<Employee> storage;
 
     public EmployeesController(HttpExchange he) {
         this.he = he;
@@ -29,7 +29,7 @@ public class EmployeesController {
         this.headers = he.getRequestHeaders();
         this.in = he.getRequestBody();
         this.out = he.getResponseBody();
-        this.storage = EmployeeStorage.getInstance();
+        this.storage = EmployeeDataAccessObject.getInstance();
     }
 
     public void index() throws Exception {

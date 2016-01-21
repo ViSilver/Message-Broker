@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 /**
  * Created by Vi
  */
-public class DataStorage<T extends Identifiable> {
+public class DataAccessObject<T extends Identifiable> {
 
     public class Item<T> {
         public Item(T data, String origin) {
@@ -42,7 +42,7 @@ public class DataStorage<T extends Identifiable> {
         private String origin;
     }
 
-    public DataStorage() {
+    public DataAccessObject() {
         items = Collections.synchronizedList(new ArrayList<Item<T>>());
     }
 
