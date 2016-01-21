@@ -1,4 +1,3 @@
-
 subprojects {
     apply plugin: 'java'
 
@@ -9,7 +8,7 @@ subprojects {
     dependencies {
         compile 'org.slf4j:slf4j-api:1.7.12'
         compile 'org.json:json:20150729'
-        compile 'org.apache.commons:commons-lang3:3.0'
+        compile 'com.fasterxml.jackson.core:jackson-databind:2.7.0-rc1'
 
         testCompile 'junit:junit:4.12'
     }
@@ -20,10 +19,10 @@ project(':common') {
 
 }
 
-project(':client') {
+project(':warehouse') {
     apply plugin: 'application'
 
-    mainClassName = 'client.Client'
+    mainClassName = 'warehouse.DataWarehouse'
 
     dependencies {
         compile project(':common')
@@ -37,10 +36,10 @@ project(':client') {
     }
 }
 
-project(':node') {
+project(':partition') {
     apply plugin: 'application'
 
-    mainClassName = 'node.Node'
+    mainClassName = 'partition.Partition'
 
     dependencies {
         compile project(':common')
@@ -52,8 +51,4 @@ project(':node') {
             args project.args.split()
         }
     }
-}
-
-task getHomeDir << {
-    println gradle.gradleHomeDir
 }

@@ -1,0 +1,16 @@
+{
+  "employees": [
+    {
+      "firstname": "Ileana",
+      "lastname": "Cosinzeana",
+      "department": "Basme",
+      "salary": 503.0
+    },
+    {
+      "firstname": "Danila",
+      "lastname": "Prepeleac",
+      "department": "Basme",
+      "salary": 304.0
+    }
+  ]
+}

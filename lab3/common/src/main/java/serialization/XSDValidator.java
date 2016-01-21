@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 
 public class XSDValidator {
-
     public static boolean validateXMLSchema(String xsdPath, String xmlPath) {
         try {
             SchemaFactory factory =
@@ -29,5 +28,4 @@ public class XSDValidator {
         }
         return true;
     }
-
 }

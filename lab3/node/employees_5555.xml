@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<employees>
+    <employee>
+        <department>Povesti</department>
+        <firstName>Laur</firstName>
+        <lastName>Balaur</lastName>
+        <salary>501.0</salary>
+    </employee>
+    <employee>
+        <department>Basme</department>
+        <firstName>Ileana</firstName>
+        <lastName>Cosinzeana</lastName>
+        <salary>503.0</salary>
+    </employee>
+    <employee>
+        <department>Basme</department>
+        <firstName>Danila</firstName>
+        <lastName>Prepeleac</lastName>
+        <salary>304.0</salary>
+    </employee>
+    <employee>
+        <department>Povesti</department>
+        <firstName>Ivan</firstName>
+        <lastName>Turbinca</lastName>
+        <salary>505.0</salary>
+    </employee>
+</employees>
